@@ -8,11 +8,11 @@ set_attack_value(AT_USPECIAL, AG_AIR_SPRITE, sprite_get("uspecial"));
 set_attack_value(AT_USPECIAL, AG_HURTBOX_SPRITE, sprite_get("uspecial_hurt"));
 set_attack_value(AT_USPECIAL, AG_USES_CUSTOM_GRAVITY, 1);
 
-// Window 1: Transform into Ghost (8 frames)
+// Window 1: Transform into Ghost (8 frames, catches herself in place)
 set_window_value(AT_USPECIAL, 1, AG_WINDOW_LENGTH, 8);
 set_window_value(AT_USPECIAL, 1, AG_WINDOW_ANIM_FRAMES, 2);
 set_window_value(AT_USPECIAL, 1, AG_WINDOW_ANIM_FRAME_START, 0);
-set_window_value(AT_USPECIAL, 1, AG_WINDOW_VSPEED, -2);
+set_window_value(AT_USPECIAL, 1, AG_WINDOW_VSPEED, 0);
 set_window_value(AT_USPECIAL, 1, AG_WINDOW_VSPEED_TYPE, 1);
 set_window_value(AT_USPECIAL, 1, AG_WINDOW_CUSTOM_GRAVITY, 0);
 set_window_value(AT_USPECIAL, 1, AG_WINDOW_HAS_SFX, 1);

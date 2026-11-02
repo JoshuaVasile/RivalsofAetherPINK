@@ -8,15 +8,15 @@ if (attack == AT_NSPECIAL || attack == AT_FSPECIAL || attack == AT_DSPECIAL || a
 if (attack == AT_USPECIAL) {
     if (window == 1) {
         hsp = 0;
-        vsp = -2;
+        vsp = 0;
     }
     if (window == 2) {
         var dx = (right_down - left_down);
         var dy = (down_down - up_down);
         if (dx == 0 && dy == 0) {
-            // No direction held: fly straight up
+            // No direction held: catch herself and float in place
             hsp = 0;
-            vsp = -6.5;
+            vsp = 0;
         } else {
             var fly_dir = point_direction(0, 0, dx, dy);
             hsp = lengthdir_x(7.5, fly_dir);
@@ -84,8 +84,12 @@ if (attack == AT_NSPECIAL) {
     move_cooldown[AT_NSPECIAL] = 10;
 }
 
-//animation is too big :/
-if (attack == AT_DSTRONG) {
+//animation is too big :/ + stay suspended in the air during aerial Down Smash
+if (attack == AT_DSTRONG || attack == AT_DAIR) {
+    if (free) {
+        hsp = 0;
+        vsp = 0;
+    }
     if (window <= 4) {
         char_height = 120;
     } else {

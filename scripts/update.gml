@@ -16,9 +16,11 @@ if (ghost_cooldown > 0)
     }
 }
 
-// Allow pressing X on Xbox controller (Strong button) in the air to trigger Ghost Flight Up Special
-if (free && move_cooldown[AT_USPECIAL] == 0 && (state == PS_FIRST_JUMP || state == PS_DOUBLE_JUMP || state == PS_IDLE_AIR || state == PS_WALL_JUMP)) {
-    if (up_strong_pressed || strong_down) {
+// Aerial Strong inputs: Down + Strong does Aerial Down Smash (bomb throw), Strong/Up+Strong does Ghost Flight
+if (free && (state == PS_FIRST_JUMP || state == PS_DOUBLE_JUMP || state == PS_IDLE_AIR || state == PS_WALL_JUMP)) {
+    if (down_strong_pressed || (down_down && strong_down)) {
+        set_attack(AT_DAIR);
+    } else if (move_cooldown[AT_USPECIAL] == 0 && (up_strong_pressed || strong_down)) {
         set_attack(AT_USPECIAL);
     }
 }
