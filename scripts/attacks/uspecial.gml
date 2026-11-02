@@ -16,7 +16,7 @@ set_window_value(AT_USPECIAL, 1, AG_WINDOW_VSPEED, 0);
 set_window_value(AT_USPECIAL, 1, AG_WINDOW_VSPEED_TYPE, 1);
 set_window_value(AT_USPECIAL, 1, AG_WINDOW_CUSTOM_GRAVITY, 0);
 set_window_value(AT_USPECIAL, 1, AG_WINDOW_HAS_SFX, 1);
-set_window_value(AT_USPECIAL, 1, AG_WINDOW_SFX, sound_get("sfx_dspecial"));
+set_window_value(AT_USPECIAL, 1, AG_WINDOW_SFX, sound_get("snd_pink_mew"));
 set_window_value(AT_USPECIAL, 1, AG_WINDOW_SFX_FRAME, 1);
 
 // Window 2: Free Ghost Flight (75 frames, steered in attack_update.gml)

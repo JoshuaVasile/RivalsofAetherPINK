@@ -495,6 +495,12 @@ with phone{
 	 * put the version number and full date.
 	 */
 	
+	initPatch("1.7", "11/2/26");
+	initPatchWords("Deltarune Battle Box Update
+	- Added Deltarune Battle Box attack triggered by landing Dummy and Kitty Note on the same opponent in quick succession.
+	- Features Purple Soul mechanics with Cat Notes on Strings and Grid Bombs battle scenarios.
+	- Added Battle Box readiness indicator next to the Dummy icon on the HUD.");
+
 	initPatch("1.4", "11/1/26");
 	initPatchWords("Changes
 	- Win screen now uses portrait.png for a crisp image.

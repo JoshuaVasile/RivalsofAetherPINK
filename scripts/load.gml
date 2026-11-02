@@ -96,3 +96,12 @@ sprite_change_offset("doki", 96, 190);
 sprite_change_offset("cat", 96, 190);
 sprite_change_offset("dummy", 96, 190);
 sprite_change_offset("dummy_cooldown", 96, 190);
+sprite_change_offset("battlebox_cooldown", 96, 190);
+
+// Deltarune Battle Box sprites
+sprite_change_offset("bb_mark", 25, 22);
+sprite_change_offset("bb_soul", 11, 11);
+sprite_change_offset("bb_box", 117, 117);
+sprite_change_offset("bb_catnote", 19, 21);
+sprite_change_offset("bb_bomb_fall", 24, 24);
+sprite_change_offset("bb_bomb_exp", 24, 24);

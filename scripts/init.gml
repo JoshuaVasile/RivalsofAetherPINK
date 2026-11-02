@@ -12,6 +12,34 @@ fan_cooldown_max = 120;
 
 ghost_cooldown = 0;
 ghost_cooldown_max = 180;
+
+// Deltarune Battle Box state (triggers when same opponent is hit by Dummy + Kitty in quick succession)
+bb_active = false;
+bb_timer = 0;
+bb_max_time = 250;
+bb_mode = 0;           // 1 = Cat Notes on Strings (15 dmg), 2 = Grid Bombs (25 dmg)
+bb_next_mode = 1;      // Alternates default mode if Pink doesn't manually pick
+bb_box_x = 0;
+bb_box_y = 0;
+bb_victim = noone;
+bb_cooldown = 0;
+bb_cooldown_max = 3600; // 60 seconds (3600 frames) cooldown; starts at 0 so ready on game load
+bb_quick_window = 240; // 4 seconds to land both Dummy and Kitty on the same opponent
+bb_dummy_hit_timer = [0, 0, 0, 0, 0];
+bb_kitty_hit_timer = [0, 0, 0, 0, 0];
+
+// Soul Heart state inside the Battle Box
+bb_soul_x = 0;
+bb_soul_y = 0;
+bb_soul_lane = 1;      // 0 = top string (-87), 1 = middle string (0), 2 = bottom string (+88)
+bb_soul_prev_y = 0;
+bb_soul_trail_timer = 0;
+bb_soul_gx = 1;        // 0..3 column on 4x4 bomb grid
+bb_soul_gy = 1;        // 0..3 row on 4x4 bomb grid
+bb_soul_move_cd = 0;
+bb_soul_invuln = 0;
+bb_objects = [];
+bb_spawned_count = 0;
  
 // STAT NAME		ZETTER VALUE   BASECAST RANGE   NOTES
 
