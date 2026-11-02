@@ -154,6 +154,7 @@ hitstun_hurtbox_spr = -1; // -1 = use hurtbox_spr
 
 // Victory
 set_victory_bg(sprite_get("victory_background")); // victory_background.png
+set_victory_portrait(sprite_get("portrait")); // sprites/portrait.png (crisp win-screen art)
 set_victory_theme(sound_get("pink_victory")); // sounds/pink_victory.ogg (victory_theme.ogg does not exist)
 
 // Movement SFX

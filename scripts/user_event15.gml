@@ -254,7 +254,7 @@ pho_has_daro_codec = 0; // Dialogue for the Daroach boss fight
 
 
 if (object_index == asset_get("cs_playerbg_obj")){
-	num_alts = 1; // Number of alt costumes; controls how many appear on the CSS
+	num_alts = 12; // Number of alt costumes; controls how many appear on the CSS
 	exit;
 }
 
@@ -494,6 +494,15 @@ with phone{
 	 * "Patch" in the function calls, and instead of a name for the patch,
 	 * put the version number and full date.
 	 */
+	
+	initPatch("1.4", "11/1/26");
+	initPatchWords("Changes
+	- Win screen now uses portrait.png for a crisp image.
+	- Kitty throw (NSpecial) no longer plays a voice line.
+	- Fixed a visual bug where an extra dummy fell out of Pink during aerial DSpecial.
+	- Aerial Down Smash can be used once, then Pink goes helpless until she lands or touches a wall.
+	- Alternate skins are back (11 alts: Irritable, Injured, Patience, Perseverance, Justice, Integrity, Kindness, Bravery, Idol, Switch, Greyscale).
+	- Dummies (DSpecial) hit harder: damage 5 -> 7, more knockback.");
 	
 	initPatch("1.1", "32 Mebruary, 20XX");
 	initPatchWords("Buffs

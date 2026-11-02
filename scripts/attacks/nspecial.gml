@@ -11,9 +11,7 @@ set_attack_value(AT_NSPECIAL, AG_HURTBOX_SPRITE, sprite_get("nspecial_hurt"));
 set_window_value(AT_NSPECIAL, 1, AG_WINDOW_LENGTH, 6);
 set_window_value(AT_NSPECIAL, 1, AG_WINDOW_ANIM_FRAMES, 2);
 set_window_value(AT_NSPECIAL, 1, AG_WINDOW_ANIM_FRAME_START, 0);
-set_window_value(AT_NSPECIAL, 1, AG_WINDOW_HAS_SFX, 1);
-set_window_value(AT_NSPECIAL, 1, AG_WINDOW_SFX, sound_get("pink_insidevoice"));
-set_window_value(AT_NSPECIAL, 1, AG_WINDOW_SFX_FRAME, 4);
+set_window_value(AT_NSPECIAL, 1, AG_WINDOW_HAS_SFX, 0); // no voice line when throwing the kitty
 
 // Window 2: Kick / projectile spawn (frames 2-3)
 set_window_value(AT_NSPECIAL, 2, AG_WINDOW_LENGTH, 4);

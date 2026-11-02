@@ -4,6 +4,7 @@ set_attack_value(AT_DAIR, AG_SPRITE, sprite_get("dstrong"));
 set_attack_value(AT_DAIR, AG_AIR_SPRITE, sprite_get("dstrong"));
 set_attack_value(AT_DAIR, AG_NUM_WINDOWS, 5);
 set_attack_value(AT_DAIR, AG_HAS_LANDING_LAG, 0);
+set_attack_value(AT_DAIR, AG_STRONG_CHARGE_WINDOW, 1);
 set_attack_value(AT_DAIR, AG_HURTBOX_SPRITE, sprite_get("dstrong_hurt"));
 set_attack_value(AT_DAIR, AG_HURTBOX_AIR_SPRITE, sprite_get("dstrong_hurt"));
 set_attack_value(AT_DAIR, AG_USES_CUSTOM_GRAVITY, 1);

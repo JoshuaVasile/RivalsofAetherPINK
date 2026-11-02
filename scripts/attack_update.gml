@@ -34,7 +34,9 @@ if (attack == AT_USPECIAL) {
 }
 
 if (attack == AT_DSPECIAL) {
-if (attack == AT_DSPECIAL && window == 2 && !dummy_spawned)
+// Only spawn the (non-damaging) dummy article on the ground. In the air it just fell out of
+// her model as a visual bug; the real damaging dummy is the DSpecial projectile hitbox.
+if (attack == AT_DSPECIAL && window == 2 && !dummy_spawned && !free)
     {
         dummy_spawned = true;
         fan_cooldown = 120;
@@ -94,6 +96,11 @@ if (attack == AT_DSTRONG || attack == AT_DAIR) {
         char_height = 120;
     } else {
         char_height = 52;
+    }
+    // After an aerial Down Smash, go helpless (pratfall) until she lands or grabs a wall
+    if (free && window == get_attack_value(attack, AG_NUM_WINDOWS)
+        && window_timer >= get_window_value(attack, window, AG_WINDOW_LENGTH) - 1) {
+        set_state(PS_PRATFALL);
     }
 }
 
