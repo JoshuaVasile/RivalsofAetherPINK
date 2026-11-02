@@ -495,6 +495,12 @@ with phone{
 	 * put the version number and full date.
 	 */
 	
+	initPatch("2.2", "11/2/26");
+	initPatchWords("Down Taunt & Ultimate Update
+	- Ultimate cooldown reduced from 60 to 40 seconds and resets on death.
+	- Down Taunt sticks her tongue out with a gasp sound.
+	- Up, Left, and Right taunts all perform her laughing taunt.");
+
 	initPatch("1.7", "11/2/26");
 	initPatchWords("Deltarune Battle Box Update
 	- Added Deltarune Battle Box attack triggered by landing Dummy and Kitty Note on the same opponent in quick succession.

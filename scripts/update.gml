@@ -21,6 +21,16 @@ if (bb_cooldown > 0)
     bb_cooldown--;
 }
 
+if (state == PS_RESPAWN) {
+    bb_cooldown = 0;
+}
+
+// Allow Down Taunt out of crouch
+if (state == PS_CROUCH && (taunt_pressed || taunt_down)) {
+    is_down_taunt = true;
+    set_attack(AT_TAUNT);
+}
+
 for (var p = 1; p <= 4; p++) {
     if (bb_dummy_hit_timer[p] > 0) bb_dummy_hit_timer[p]--;
     if (bb_kitty_hit_timer[p] > 0) bb_kitty_hit_timer[p]--;

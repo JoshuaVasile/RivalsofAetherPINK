@@ -6,6 +6,7 @@
  
 ghost_spawned = false;
 dummy_spawned = false;
+is_down_taunt = false;
 
 fan_cooldown = 0;
 fan_cooldown_max = 120;
@@ -23,7 +24,7 @@ bb_box_x = 0;
 bb_box_y = 0;
 bb_victim = noone;
 bb_cooldown = 0;
-bb_cooldown_max = 3600; // 60 seconds (3600 frames) cooldown; starts at 0 so ready on game load
+bb_cooldown_max = 2400; // 40 seconds (2400 frames) cooldown; starts at 0 so ready on game load
 bb_quick_window = 240; // 4 seconds to land both Dummy and Kitty on the same opponent
 bb_dummy_hit_timer = [0, 0, 0, 0, 0];
 bb_kitty_hit_timer = [0, 0, 0, 0, 0];

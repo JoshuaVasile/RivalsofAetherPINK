@@ -96,3 +96,5 @@ if (bb_active) {
         draw_sprite_ext(soul_spr, 0, bb_box_x + bb_soul_x, bb_box_y + bb_soul_y, 1, 1, 0, c_white, soul_alpha);
     }
 }
+
+

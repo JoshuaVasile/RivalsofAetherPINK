@@ -87,6 +87,7 @@ sprite_change_offset("dspecial_air", 96, 190);
 sprite_change_offset("dspecial_hurt", 96, 190);
 sprite_change_offset("dspecial_air_hurt", 96, 190);
 sprite_change_offset("taunt", 96, 190);
+sprite_change_offset("Pink_overworld_toungue", 96, 190);
 
 sprite_change_offset("plat", 93, 14);
 
