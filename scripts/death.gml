@@ -3,6 +3,7 @@ sound_play(sound_get("pink_trip"));
 
 // Ultimate reset on death: refresh Battle Box cooldown so she gets it back to use again
 bb_cooldown = 0;
+heal_popup_timer = 0;
 for (var p = 1; p <= 4; p++) {
     bb_dummy_hit_timer[p] = 0;
     bb_kitty_hit_timer[p] = 0;

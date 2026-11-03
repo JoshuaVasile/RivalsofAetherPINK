@@ -21,6 +21,12 @@ if (bb_cooldown > 0)
     bb_cooldown--;
 }
 
+if (heal_popup_timer > 0)
+{
+    heal_popup_timer--;
+    heal_popup_y -= 0.6;
+}
+
 if (state == PS_RESPAWN) {
     bb_cooldown = 0;
 }

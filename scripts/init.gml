@@ -8,6 +8,16 @@ ghost_spawned = false;
 dummy_spawned = false;
 is_down_taunt = false;
 
+// Neutral A (Kiss with Heart) Crit & Heal mechanics
+jab_crit_chance = 7;        // 7% chance for Neutral A to crit
+jab_is_crit = false;
+heal_popup_timer = 0;
+heal_popup_amount = 0;
+heal_popup_is_crit = false;
+heal_popup_x = 0;
+heal_popup_y = 0;
+kiss_on_forward_tilt = false; // Set to true if holding Left/Right + Attack should also do the Kiss instead of the parasol poke
+
 fan_cooldown = 0;
 fan_cooldown_max = 120;
 

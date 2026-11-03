@@ -495,6 +495,13 @@ with phone{
 	 * put the version number and full date.
 	 */
 	
+	initPatch("2.4", "11/2/26");
+	initPatchWords("Neutral A Kiss, Crit & Heal Update
+	- Neutral A base damage reduced by half to 4 on standard hits.
+	- Neutral A has a 7% chance to Crit (11 damage, heavier knockback, 10 frames hitpause, sweetspot impact VFX, and plays smooch.ogg).
+	- Only crits heal Pink (heals 10 damage).
+	- Visual floating heart popup above Pink displays '+10 CRIT!' on critical hits.");
+
 	initPatch("2.2", "11/2/26");
 	initPatchWords("Down Taunt & Ultimate Update
 	- Ultimate cooldown reduced from 60 to 40 seconds and resets on death.

@@ -97,4 +97,24 @@ if (bb_active) {
     }
 }
 
+// Floating Heal popup (+7 or +14 CRIT!) above Pink
+if (heal_popup_timer > 0) {
+    var p_alpha = min(1, heal_popup_timer / 15);
+    var mark_spr = sprite_get("bb_mark");
+    var p_str = (heal_popup_is_crit ? "+" + string(heal_popup_amount) + " CRIT!" : "+" + string(heal_popup_amount));
+    var p_col = heal_popup_is_crit ? make_color_rgb(255, 230, 80) : make_color_rgb(100, 255, 120);
+
+    // Draw little floating heart
+    draw_sprite_ext(mark_spr, 0, heal_popup_x - 14, heal_popup_y, 0.65, 0.65, 0, c_white, p_alpha);
+
+    // Draw heal text with drop shadow
+    draw_set_font(asset_get("fName"));
+    draw_set_halign(fa_left);
+    draw_set_valign(fa_middle);
+    draw_text_ext_transformed_color(heal_popup_x - 2, heal_popup_y + 1, p_str, 10, 200, 1, 1, 0, c_black, c_black, c_black, c_black, p_alpha);
+    draw_text_ext_transformed_color(heal_popup_x - 3, heal_popup_y, p_str, 10, 200, 1, 1, 0, p_col, p_col, p_col, p_col, p_alpha);
+    draw_set_halign(fa_left);
+    draw_set_valign(fa_top);
+}
+
 

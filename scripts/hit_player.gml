@@ -3,6 +3,23 @@
 if (instance_exists(hit_player_obj) && !hit_player_obj.clone && hit_player_obj.player >= 1 && hit_player_obj.player <= 4) {
     var vp = hit_player_obj.player;
 
+    // Neutral A (Kiss with Heart): Only Crits heal Pink (10 damage) and play smooch SFX
+    if (my_hitboxID.attack == AT_JAB) {
+        if (jab_is_crit) {
+            set_player_damage(player, max(0, get_player_damage(player) - 10));
+            sound_play(sound_get("smooch"));
+            sound_play(sound_get("heart_electric"));
+            hit_player_obj.hitstop = max(hit_player_obj.hitstop, 12);
+            hitstop = max(hitstop, 12);
+
+            heal_popup_timer = 45;
+            heal_popup_amount = 10;
+            heal_popup_is_crit = true;
+            heal_popup_x = x;
+            heal_popup_y = y - char_height - 15;
+        }
+    }
+
     // Record Dummy hit (AT_DSPECIAL) or Kitty Musical Note hit (AT_NSPECIAL) when Battle Box is off cooldown
     if (!bb_active && bb_cooldown <= 0) {
         if (my_hitboxID.attack == AT_DSPECIAL) {

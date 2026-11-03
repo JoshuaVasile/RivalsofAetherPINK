@@ -26,10 +26,13 @@ set_hitbox_value(AT_JAB, 1, HG_HITBOX_Y, -39);
 set_hitbox_value(AT_JAB, 1, HG_WIDTH, 30);
 set_hitbox_value(AT_JAB, 1, HG_HEIGHT, 36);
 set_hitbox_value(AT_JAB, 1, HG_PRIORITY, 2);
-set_hitbox_value(AT_JAB, 1, HG_DAMAGE, 8);
+set_hitbox_value(AT_JAB, 1, HG_DAMAGE, 4); // Base damage dialed back to half (was 8)
 set_hitbox_value(AT_JAB, 1, HG_ANGLE, 60);
 set_hitbox_value(AT_JAB, 1, HG_BASE_KNOCKBACK, 4);
+set_hitbox_value(AT_JAB, 1, HG_KNOCKBACK_SCALING, 0);
 set_hitbox_value(AT_JAB, 1, HG_BASE_HITPAUSE, 6);
+set_hitbox_value(AT_JAB, 1, HG_HITPAUSE_SCALING, 0);
+set_hitbox_value(AT_JAB, 1, HG_VISUAL_EFFECT, 0);
 set_hitbox_value(AT_JAB, 1, HG_VISUAL_EFFECT_X_OFFSET, 32);
 set_hitbox_value(AT_JAB, 1, HG_VISUAL_EFFECT_Y_OFFSET, -10);
 set_hitbox_value(AT_JAB, 1, HG_HIT_SFX, sound_get("snd_hurt1"));
