@@ -27,7 +27,19 @@ if (heal_popup_timer > 0)
     heal_popup_y -= 0.6;
 }
 
-if (state == PS_RESPAWN) {
+if (state != PS_PARRY) {
+    successful_parry = false;
+    parry_success_timer = 0;
+}
+
+// She does not spawn with her Ultimate; reset on respawn/death and unlock when she reaches 60% damage
+if (state == PS_RESPAWN || state == PS_SPAWN || state == PS_DEAD) {
+    bb_unlocked = false;
+    bb_cooldown = 0;
+    bb_dummy_hit_timer = [0, 0, 0, 0, 0];
+    bb_kitty_hit_timer = [0, 0, 0, 0, 0];
+} else if (!bb_unlocked && get_player_damage(player) >= 60) {
+    bb_unlocked = true;
     bb_cooldown = 0;
 }
 
@@ -96,10 +108,10 @@ if (bb_active) {
             if (bb_timer >= 12) {
                 if (attack_pressed || special_pressed) {
                     bb_mode = 1; // Option 1: Cat Musical Notes on 3 Strings
-                    bb_max_time = 250;
+                    bb_max_time = 340; // 1.5s longer (was 250)
                 } else if (up_strong_pressed || down_strong_pressed || left_strong_pressed || right_strong_pressed || strong_down || jump_pressed) {
                     bb_mode = 2; // Option 2: Falling Bombs on 4x4 Grid
-                    bb_max_time = 260;
+                    bb_max_time = 350; // 1.5s longer (was 260)
                 }
             }
             if (bb_timer == 40) {
@@ -113,15 +125,16 @@ if (bb_active) {
                 } else {
                     bb_soul_gx = 1;
                     bb_soul_gy = 1;
-                    bb_soul_x = -31;
+                    bb_soul_x = -39;
                     bb_soul_y = -31;
                 }
             }
         } else if (bb_mode == 1) {
             // =========================================================================
-            // FIGHT OPTION 1: Cat Musical Notes on 3 Purple Strings (15 damage per hit)
+            // FIGHT OPTION 1: Cat Musical Notes on 3 Purple Strings (10 damage per hit, 30% less than 15)
+            // Box is 1.25x longer horizontally (-118..118 instead of -94..94)
             // =========================================================================
-            bb_soul_x = clamp(bb_soul_x + 3.5 * (v_right - v_left), -94, 94);
+            bb_soul_x = clamp(bb_soul_x + 3.8 * (v_right - v_left), -118, 118);
             if (bb_soul_move_cd <= 0) {
                 if (v_up && bb_soul_lane > 0) {
                     bb_soul_prev_y = bb_soul_y;
@@ -137,32 +150,40 @@ if (bb_active) {
             }
             bb_soul_y = (bb_soul_lane == 0) ? -87 : ((bb_soul_lane == 1) ? 0 : 88);
 
-            // Spawn 5 waves of Cat Musical Notes (at frames 45, 81, 117, 153, 189)
-            if ((bb_timer - 45) >= 0 && ((bb_timer - 45) % 36 == 0) && bb_spawned_count < 5) {
+            // Spawn 7 waves of Cat Musical Notes across the extended duration
+            if ((bb_timer - 45) >= 0 && ((bb_timer - 45) % 38 == 0) && bb_spawned_count < 7) {
                 bb_spawned_count++;
                 var target_lane = bb_soul_lane;
                 if (up_down) target_lane = 0;
                 else if (down_down) target_lane = 2;
+
+                var second_lane = (target_lane + 1 + (bb_spawned_count % 2)) % 3;
+
+                // NEVER spawn a kitty in the middle lane (lane 1) at the start of the box creation
+                // where the Soul Heart spawns, so players realize how to play the fight!
+                if (bb_spawned_count == 1) {
+                    target_lane = 0;
+                    second_lane = 2;
+                }
 
                 var from_side = ((bb_spawned_count % 2) == 1) ? -1 : 1;
                 var l_y = (target_lane == 0) ? -87 : ((target_lane == 1) ? 0 : 88);
                 bb_objects[array_length(bb_objects)] = {
                     type: 1,
                     lane: target_lane,
-                    x: from_side * 102,
+                    x: from_side * 128,
                     y: l_y,
                     vx: -from_side * 3.8,
                     timer: 0,
                     active: true
                 };
 
-                // Secondary staggered Cat Note on another string (leaves 1 string open to dodge to)
-                var second_lane = (target_lane + 1 + (bb_spawned_count % 2)) % 3;
+                // Secondary staggered Cat Note on another string (leaves at least 1 string open to dodge to)
                 var l2_y = (second_lane == 0) ? -87 : ((second_lane == 1) ? 0 : 88);
                 bb_objects[array_length(bb_objects)] = {
                     type: 1,
                     lane: second_lane,
-                    x: -from_side * 102,
+                    x: -from_side * 128,
                     y: l2_y,
                     vx: from_side * 3.5,
                     timer: 0,
@@ -171,16 +192,16 @@ if (bb_active) {
                 sound_play(sound_get("snd_pink_mew"));
             }
 
-            // Update Cat Musical Notes & check collisions (15 damage)
+            // Update Cat Musical Notes & check collisions (5 damage, cut in half from 10)
             for (var i = 0; i < array_length(bb_objects); i++) {
                 var obj = bb_objects[i];
                 if (obj.active && obj.type == 1) {
                     obj.x += obj.vx;
                     obj.timer++;
-                    if (abs(obj.x) > 118) {
+                    if (abs(obj.x) > 148) {
                         obj.active = false;
                     } else if (bb_soul_invuln <= 0 && obj.lane == bb_soul_lane && abs(obj.x - bb_soul_x) < 22) {
-                        take_damage(bb_victim.player, player, 15);
+                        take_damage(bb_victim.player, player, 5);
                         bb_soul_invuln = 28;
                         obj.active = false;
                         sound_play(sound_get("snd_hurt1"));
@@ -190,7 +211,7 @@ if (bb_active) {
             }
         } else {
             // =========================================================================
-            // FIGHT OPTION 2: Grid Bombs on 4x4 Dots (destroys row + col, 25 damage)
+            // FIGHT OPTION 2: Grid Bombs on 4x4 Dots (destroys row + col, 8 damage, cut in half from 17)
             // =========================================================================
             if (bb_soul_move_cd <= 0) {
                 var mdx = v_right - v_left;
@@ -201,13 +222,13 @@ if (bb_active) {
                     bb_soul_move_cd = 9;
                 }
             }
-            var targ_x = (bb_soul_gx == 0) ? -94 : ((bb_soul_gx == 1) ? -31 : ((bb_soul_gx == 2) ? 31 : 94));
+            var targ_x = (bb_soul_gx == 0) ? -118 : ((bb_soul_gx == 1) ? -39 : ((bb_soul_gx == 2) ? 39 : 118));
             var targ_y = (bb_soul_gy == 0) ? -94 : ((bb_soul_gy == 1) ? -31 : ((bb_soul_gy == 2) ? 31 : 94));
             bb_soul_x = lerp(bb_soul_x, targ_x, 0.45);
             bb_soul_y = lerp(bb_soul_y, targ_y, 0.45);
 
-            // Spawn 4 Bombs onto grid dots (at frames 45, 92, 139, 186)
-            if ((bb_timer - 45) >= 0 && ((bb_timer - 45) % 47 == 0) && bb_spawned_count < 4) {
+            // Spawn 6 Bombs onto grid dots across the extended duration
+            if ((bb_timer - 45) >= 0 && ((bb_timer - 45) % 45 == 0) && bb_spawned_count < 6) {
                 bb_spawned_count++;
                 var b_gx = bb_soul_gx;
                 var b_gy = bb_soul_gy;
@@ -216,7 +237,7 @@ if (bb_active) {
                 if (up_down) b_gy = max(0, b_gy - 1);
                 if (down_down) b_gy = min(3, b_gy + 1);
 
-                var bx = (b_gx == 0) ? -94 : ((b_gx == 1) ? -31 : ((b_gx == 2) ? 31 : 94));
+                var bx = (b_gx == 0) ? -118 : ((b_gx == 1) ? -39 : ((b_gx == 2) ? 39 : 118));
                 var by = (b_gy == 0) ? -94 : ((b_gy == 1) ? -31 : ((b_gy == 2) ? 31 : 94));
                 bb_objects[array_length(bb_objects)] = {
                     type: 2,
@@ -231,7 +252,7 @@ if (bb_active) {
                 sound_play(sound_get("snd_bombfall"));
             }
 
-            // Update Bombs: timer 1..30 falls onto dot, timer 31..55 explodes along entire row & column (25 damage)
+            // Update Bombs: timer 1..30 falls onto dot, timer 31..55 explodes along entire row & column (17 damage = 30% less than 25)
             for (var i = 0; i < array_length(bb_objects); i++) {
                 var obj = bb_objects[i];
                 if (obj.active && obj.type == 2) {
@@ -241,7 +262,7 @@ if (bb_active) {
                     }
                     if (obj.timer >= 31 && obj.timer <= 46 && !obj.hit_done && bb_soul_invuln <= 0) {
                         if (bb_soul_gx == obj.gx || bb_soul_gy == obj.gy) {
-                            take_damage(bb_victim.player, player, 25);
+                            take_damage(bb_victim.player, player, 8);
                             obj.hit_done = true;
                             bb_soul_invuln = 30;
                             sound_play(sound_get("snd_hurt1"));
@@ -275,11 +296,20 @@ if (bb_active) {
     }
 }
 
-// Aerial Strong inputs: Down + Strong does Aerial Down Smash (bomb throw), Strong/Up+Strong does Ghost Flight
+// Aerial Strong inputs:
+// - Down + Strong does Aerial Down Smash (AT_DSTRONG when free: slowly falls, charges bomb, spikes downward, free fall after)
+// - Left / Right + Strong does Aerial Left/Right Smash (AT_FAIR: slowly falls, charges bomb, drops bomb left or right, free fall after)
+// - Up + Strong / Neutral Strong does Ghost Flight (AT_USPECIAL)
 if (!bb_active && free && (state == PS_FIRST_JUMP || state == PS_DOUBLE_JUMP || state == PS_IDLE_AIR || state == PS_WALL_JUMP)) {
-    if (down_strong_pressed || (down_down && strong_down)) {
-        set_attack(AT_DAIR);
-    } else if (move_cooldown[AT_USPECIAL] == 0 && (up_strong_pressed || strong_down)) {
+    if (down_strong_pressed || (down_down && (strong_pressed || strong_down))) {
+        set_attack(AT_DSTRONG);
+    } else if (left_strong_pressed || (left_down && (strong_pressed || strong_down))) {
+        spr_dir = -1;
+        set_attack(AT_FAIR);
+    } else if (right_strong_pressed || (right_down && (strong_pressed || strong_down))) {
+        spr_dir = 1;
+        set_attack(AT_FAIR);
+    } else if (move_cooldown[AT_USPECIAL] == 0 && (up_strong_pressed || (up_down && (strong_pressed || strong_down)) || strong_pressed || strong_down)) {
         set_attack(AT_USPECIAL);
     }
 }

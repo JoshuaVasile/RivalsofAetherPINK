@@ -7,9 +7,11 @@
 ghost_spawned = false;
 dummy_spawned = false;
 is_down_taunt = false;
+successful_parry = false;
+parry_success_timer = 0;
 
 // Neutral A (Kiss with Heart) Crit & Heal mechanics
-jab_crit_chance = 7;        // 7% chance for Neutral A to crit
+jab_crit_chance = 25;       // 25% chance for Neutral A to crit and heal for 7
 jab_is_crit = false;
 heal_popup_timer = 0;
 heal_popup_amount = 0;
@@ -17,6 +19,8 @@ heal_popup_is_crit = false;
 heal_popup_x = 0;
 heal_popup_y = 0;
 kiss_on_forward_tilt = false; // Set to true if holding Left/Right + Attack should also do the Kiss instead of the parasol poke
+
+air_charge_timer = 0;
 
 fan_cooldown = 0;
 fan_cooldown_max = 120;
@@ -27,14 +31,15 @@ ghost_cooldown_max = 180;
 // Deltarune Battle Box state (triggers when same opponent is hit by Dummy + Kitty in quick succession)
 bb_active = false;
 bb_timer = 0;
-bb_max_time = 250;
-bb_mode = 0;           // 1 = Cat Notes on Strings (15 dmg), 2 = Grid Bombs (25 dmg)
+bb_max_time = 340;     // 1.5 seconds (90 frames) longer than before (was 250)
+bb_mode = 0;           // 1 = Cat Notes on Strings (5 dmg), 2 = Grid Bombs (8 dmg)
 bb_next_mode = 1;      // Alternates default mode if Pink doesn't manually pick
 bb_box_x = 0;
 bb_box_y = 0;
 bb_victim = noone;
+bb_unlocked = false;   // Does not spawn with ultimate; unlocks at 60% damage
 bb_cooldown = 0;
-bb_cooldown_max = 2400; // 40 seconds (2400 frames) cooldown; starts at 0 so ready on game load
+bb_cooldown_max = 2400; // 40 seconds (2400 frames) cooldown after use
 bb_quick_window = 240; // 4 seconds to land both Dummy and Kitty on the same opponent
 bb_dummy_hit_timer = [0, 0, 0, 0, 0];
 bb_kitty_hit_timer = [0, 0, 0, 0, 0];

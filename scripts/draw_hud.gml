@@ -2,6 +2,7 @@
 user_event(11);
 
 // Battle Box readiness indicator (to the left of the Dummy icon at temp_x + 140, 496)
+// Only active once Pink has unlocked her Ultimate at 60% damage and cooldown is 0
 var bb_primed = false;
 for (var p = 1; p <= 4; p++) {
     if (bb_dummy_hit_timer[p] > 0 || bb_kitty_hit_timer[p] > 0) {
@@ -9,7 +10,7 @@ for (var p = 1; p <= 4; p++) {
     }
 }
 
-if (bb_cooldown == 0)
+if (bb_unlocked && bb_cooldown == 0)
 {
     // Pulse slightly when an opponent is primed with 1 hit so landing the second hit triggers the Battle Box
     var bb_alpha = 1;

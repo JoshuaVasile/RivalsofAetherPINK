@@ -3,7 +3,7 @@
 user_event(12);
 
 // Draw the two Doki hearts above any opponent currently marked with 1 of the 2 hits (Dummy or Kitty)
-if (!bb_active && bb_cooldown <= 0) {
+if (!bb_active && bb_unlocked && bb_cooldown <= 0) {
     var mark_spr = sprite_get("bb_mark");
     var gt = get_gameplay_time();
     with (oPlayer) {
@@ -18,7 +18,7 @@ if (!bb_active && bb_cooldown <= 0) {
     }
 }
 
-// Draw the Deltarune Battle Box when active
+// Draw the Deltarune Battle Box when active (1.25x longer horizontally)
 if (bb_active) {
     var box_spr = sprite_get("bb_box");
     var soul_spr = sprite_get("bb_soul");
@@ -30,11 +30,11 @@ if (bb_active) {
     var box_ang = (1 - box_scale) * 180;
     var box_frame = (bb_timer < 40) ? 0 : ((bb_mode == 2) ? 2 : 1);
 
-    // 1. Draw the Battle Box (Frame 0 during spin-in, Frame 1 for Cat Note Strings, Frame 2 for 4x4 Bomb Grid)
-    draw_sprite_ext(box_spr, box_frame, bb_box_x, bb_box_y, box_scale, box_scale, box_ang, c_white, 1);
+    // 1. Draw the Battle Box (slightly longer horizontally: 1.25x width)
+    draw_sprite_ext(box_spr, box_frame, bb_box_x, bb_box_y, box_scale * 1.25, box_scale, box_ang, c_white, 1);
 
     if (bb_timer >= 40) {
-        // 2. If in Strings mode and the Purple Heart just jumped between strings, draw the fading purple trail (like Boss Battle.png)
+        // 2. If in Strings mode and the Purple Heart just jumped between strings, draw the fading purple trail
         if (bb_mode == 1 && bb_soul_trail_timer > 0) {
             var t_alpha = (bb_soul_trail_timer / 10) * 0.55;
             var mid_y = lerp(bb_soul_y, bb_soul_prev_y, 0.5);
@@ -58,7 +58,7 @@ if (bb_active) {
                         // Warning flash on target dot & row/column + falling bomb sprite
                         if ((obj.timer % 6) < 3) {
                             draw_set_alpha(0.4);
-                            draw_line_width_color(bb_box_x - 110, gy_pos, bb_box_x + 110, gy_pos, 4, c_fuchsia, c_fuchsia);
+                            draw_line_width_color(bb_box_x - 138, gy_pos, bb_box_x + 138, gy_pos, 4, c_fuchsia, c_fuchsia);
                             draw_line_width_color(gx_pos, bb_box_y - 110, gx_pos, bb_box_y + 110, 4, c_fuchsia, c_fuchsia);
                             draw_set_alpha(1);
                         }
@@ -72,18 +72,19 @@ if (bb_active) {
                         var exp_frame = clamp(floor(exp_prog * 8), 0, 7);
                         var beam_w = max(2, round(18 * (1 - exp_prog * 0.6)));
 
-                        // Draw full-row & full-column white/black blast beams inside the 234x234 box
-                        draw_rectangle_color(bb_box_x - 111, gy_pos - beam_w - 2, bb_box_x + 111, gy_pos + beam_w + 2, c_black, c_black, c_black, c_black, false);
+                        // Draw full-row & full-column white/black blast beams inside the wider box
+                        draw_rectangle_color(bb_box_x - 139, gy_pos - beam_w - 2, bb_box_x + 139, gy_pos + beam_w + 2, c_black, c_black, c_black, c_black, false);
                         draw_rectangle_color(gx_pos - beam_w - 2, bb_box_y - 111, gx_pos + beam_w + 2, bb_box_y + 111, c_black, c_black, c_black, c_black, false);
-                        draw_rectangle_color(bb_box_x - 111, gy_pos - beam_w, bb_box_x + 111, gy_pos + beam_w, c_white, c_white, c_white, c_white, false);
+                        draw_rectangle_color(bb_box_x - 139, gy_pos - beam_w, bb_box_x + 139, gy_pos + beam_w, c_white, c_white, c_white, c_white, false);
                         draw_rectangle_color(gx_pos - beam_w, bb_box_y - 111, gx_pos + beam_w, bb_box_y + 111, c_white, c_white, c_white, c_white, false);
 
                         // Draw the Deltarune bomb cross explosion sprite along the row and column intersections
                         for (var k = 0; k < 4; k++) {
-                            var dpos = (k == 0) ? -94 : ((k == 1) ? -31 : ((k == 2) ? 31 : 94));
-                            draw_sprite_ext(bexp_spr, exp_frame, bb_box_x + dpos, gy_pos, 1, 1, 0, c_white, 1);
-                            if (bb_box_y + dpos != gy_pos) {
-                                draw_sprite_ext(bexp_spr, exp_frame, gx_pos, bb_box_y + dpos, 1, 1, 0, c_white, 1);
+                            var dpos_x = (k == 0) ? -118 : ((k == 1) ? -39 : ((k == 2) ? 39 : 118));
+                            var dpos_y = (k == 0) ? -94 : ((k == 1) ? -31 : ((k == 2) ? 31 : 94));
+                            draw_sprite_ext(bexp_spr, exp_frame, bb_box_x + dpos_x, gy_pos, 1, 1, 0, c_white, 1);
+                            if (bb_box_y + dpos_y != gy_pos) {
+                                draw_sprite_ext(bexp_spr, exp_frame, gx_pos, bb_box_y + dpos_y, 1, 1, 0, c_white, 1);
                             }
                         }
                     }
@@ -97,7 +98,7 @@ if (bb_active) {
     }
 }
 
-// Floating Heal popup (+7 or +14 CRIT!) above Pink
+// Floating Heal popup (+10 CRIT!) above Pink
 if (heal_popup_timer > 0) {
     var p_alpha = min(1, heal_popup_timer / 15);
     var mark_spr = sprite_get("bb_mark");
@@ -116,5 +117,3 @@ if (heal_popup_timer > 0) {
     draw_set_halign(fa_left);
     draw_set_valign(fa_top);
 }
-
-

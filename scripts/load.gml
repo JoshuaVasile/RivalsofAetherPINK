@@ -70,6 +70,8 @@ sprite_change_offset("ustrong", 96, 190);
 sprite_change_offset("ustrong_hurt", 96, 190);
 sprite_change_offset("dstrong", 96, 190);
 sprite_change_offset("dstrong_hurt", 96, 190);
+sprite_change_offset("dstrong_cry", 96, 190);
+sprite_change_offset("dstrong_cry_hurt", 96, 190);
 
 sprite_change_offset("nspecial", 96, 190);
 sprite_change_offset("nspecial_air", 96, 190);
@@ -98,6 +100,11 @@ sprite_change_offset("cat", 96, 190);
 sprite_change_offset("dummy", 96, 190);
 sprite_change_offset("dummy_cooldown", 96, 190);
 sprite_change_offset("battlebox_cooldown", 96, 190);
+
+sprite_change_offset("parry_success", 96, 190);
+sprite_change_offset("parry_success_hurt", 96, 190);
+sprite_change_offset("lane_bullet", 32, 32);
+sprite_change_offset("lane_bullet_mask", 32, 32);
 
 // Deltarune Battle Box sprites
 sprite_change_offset("bb_mark", 25, 22);

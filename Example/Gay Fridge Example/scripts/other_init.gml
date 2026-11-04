@@ -1,0 +1,2 @@
+nspecial = false;
+starfruitId = noone;

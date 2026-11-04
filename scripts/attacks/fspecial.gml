@@ -39,7 +39,7 @@ set_hitbox_value(AT_FSPECIAL, 1, HG_WIDTH, 90);
 set_hitbox_value(AT_FSPECIAL, 1, HG_HEIGHT, 80);
 set_hitbox_value(AT_FSPECIAL, 1, HG_PRIORITY, 3);
 set_hitbox_value(AT_FSPECIAL, 1, HG_DAMAGE, 6);
-set_hitbox_value(AT_FSPECIAL, 1, HG_ANGLE, 140);
+set_hitbox_value(AT_FSPECIAL, 1, HG_ANGLE, 45);
 set_hitbox_value(AT_FSPECIAL, 1, HG_VISUAL_EFFECT_Y_OFFSET, 0);
 set_hitbox_value(AT_FSPECIAL, 1, HG_BASE_KNOCKBACK, 4);
 set_hitbox_value(AT_FSPECIAL, 1, HG_KNOCKBACK_SCALING, 0.3);
@@ -47,7 +47,7 @@ set_hitbox_value(AT_FSPECIAL, 1, HG_HITSTUN_MULTIPLIER, 1.5);
 set_hitbox_value(AT_FSPECIAL, 1, HG_PROJECTILE_SPRITE, sprite_get("ghost"));
 set_hitbox_value(AT_FSPECIAL, 1, HG_PROJECTILE_MASK, sprite_get("ghost"));
 set_hitbox_value(AT_FSPECIAL, 1, HG_PROJECTILE_ANIM_SPEED, .1);
-set_hitbox_value(AT_FSPECIAL, 1, HG_PROJECTILE_HSPEED, -6);    // Optional horizontal throw speed
+set_hitbox_value(AT_FSPECIAL, 1, HG_PROJECTILE_HSPEED, 6);    // Floats in the direction of the dash
 set_hitbox_value(AT_FSPECIAL, 1, HG_PROJECTILE_VSPEED, 1);   // Initial upward velocity
 set_hitbox_value(AT_FSPECIAL, 1, HG_PROJECTILE_GRAVITY, -0.05);
 set_hitbox_value(AT_FSPECIAL, 1, HG_PROJECTILE_GROUND_FRICTION, 0);
