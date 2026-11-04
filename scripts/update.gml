@@ -46,7 +46,7 @@ if (state == PS_RESPAWN || state == PS_SPAWN || state == PS_DEAD) {
 // Allow Down Taunt out of crouch
 if (state == PS_CROUCH && (taunt_pressed || taunt_down)) {
     is_down_taunt = true;
-    set_attack(AT_TAUNT);
+    set_attack(AT_TAUNT_2);
 }
 
 for (var p = 1; p <= 4; p++) {

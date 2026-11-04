@@ -183,15 +183,19 @@ if (attack == AT_JAB) {
 }
 
 // Taunts:
-// Down Taunt (holding Down on stick/c-stick, or crouching) = tongue out with snd_pink_gasp.
-// Up, Left, Right, and Neutral taunts = laughing taunt.
+// Down Taunt (holding Down on stick/c-stick, crouching, or Secondary Taunt button) = tongue out with snd_pink_gasp (AT_TAUNT_2).
+// Up, Left, Right, and Neutral taunts = laughing taunt (AT_TAUNT).
 if (attack == AT_TAUNT || attack == AT_TAUNT_2) {
     var has_down = (attack == AT_TAUNT_2 || down_down || down_pressed || down_stick_down || down_hard_pressed || state == PS_CROUCH || is_down_taunt);
-    if (up_down || (!down_down && !down_pressed && !down_stick_down && state != PS_CROUCH && !is_down_taunt)) {
+    if (up_down) {
         has_down = false;
     }
     is_down_taunt = has_down;
-    attack = AT_TAUNT;
+    if (has_down) {
+        attack = AT_TAUNT_2;
+    } else {
+        attack = AT_TAUNT;
+    }
 }
 
 user_event(13);

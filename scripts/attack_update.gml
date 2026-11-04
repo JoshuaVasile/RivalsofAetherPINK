@@ -207,30 +207,28 @@ if (attack == AT_DAIR && free) {
     }
 }
 
-// Taunt handling: Down Taunt uses tongue expression with snd_pink_gasp; Neutral, Up, Left, Right laugh
-if (attack == AT_TAUNT) {
-    if (is_down_taunt) {
-        sprite_index = sprite_get("Pink_overworld_toungue");
-        image_index = 0;
-        can_jump = (window >= 2);
-        can_shield = (window >= 2);
-        if (window == 1 && window_timer == 1) {
-            sound_stop(sound_get("pink_laugh1"));
-            sound_play(sound_get("snd_pink_gasp"));
+// Taunt handling: Down Taunt (AT_TAUNT_2 or Down + AT_TAUNT) uses tongue expression with snd_pink_gasp; Neutral, Up, Left, Right laugh (AT_TAUNT)
+if (attack == AT_TAUNT_2 || (attack == AT_TAUNT && is_down_taunt)) {
+    sprite_index = sprite_get("Pink_overworld_toungue");
+    image_index = 0;
+    can_jump = (window >= 2);
+    can_shield = (window >= 2);
+    if (window == 1 && window_timer == 1) {
+        sound_stop(sound_get("pink_laugh1"));
+        sound_play(sound_get("snd_pink_gasp"));
+    }
+    if (window == 2 && (down_down || down_stick_down || taunt_down)) {
+        if (window_timer >= get_window_value(attack, window, AG_WINDOW_LENGTH) - 1) {
+            window_timer = 0;
         }
-        if (window == 2 && (down_down || down_stick_down || taunt_down)) {
-            if (window_timer >= get_window_value(attack, window, AG_WINDOW_LENGTH) - 1) {
-                window_timer = 0;
-            }
-        }
-        if (window == 3 && window_timer >= get_window_value(attack, window, AG_WINDOW_LENGTH) - 1) {
-            is_down_taunt = false;
-        }
-    } else {
-        sprite_index = sprite_get("taunt");
-        if (window == 1 && window_timer == 1) {
-            sound_stop(sound_get("snd_pink_gasp"));
-            sound_play(sound_get("pink_laugh1"));
-        }
+    }
+    if (window == 3 && window_timer >= get_window_value(attack, window, AG_WINDOW_LENGTH) - 1) {
+        is_down_taunt = false;
+    }
+} else if (attack == AT_TAUNT) {
+    sprite_index = sprite_get("taunt");
+    if (window == 1 && window_timer == 1) {
+        sound_stop(sound_get("snd_pink_gasp"));
+        sound_play(sound_get("pink_laugh1"));
     }
 }

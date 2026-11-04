@@ -7,8 +7,8 @@ if (state == PS_PARRY && successful_parry) {
     parry_success_timer++;
 }
 
-if ((state == PS_ATTACK_GROUND || state == PS_ATTACK_AIR) && attack == AT_TAUNT) {
-    if (is_down_taunt) {
+if ((state == PS_ATTACK_GROUND || state == PS_ATTACK_AIR) && (attack == AT_TAUNT || attack == AT_TAUNT_2)) {
+    if (attack == AT_TAUNT_2 || is_down_taunt) {
         sprite_index = sprite_get("Pink_overworld_toungue");
         image_index = 0;
     }
