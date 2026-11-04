@@ -9,11 +9,22 @@ if (attack == AT_FTILT && kiss_on_forward_tilt) {
     attack = AT_JAB;
 }
 
-// In the air, distinguish Air Down Smash vs Her Down A:
+// In the air, distinguish Aerial Attacks vs Aerial Strongs:
 if (free) {
     if (attack == AT_DAIR) {
         if (down_strong_pressed || strong_pressed || strong_down) {
             attack = AT_DSTRONG; // Air Down Smash (Charged Bomb dropping down)
+        }
+    }
+    if (attack == AT_FAIR) {
+        if (right_strong_pressed || left_strong_pressed || strong_pressed || strong_down) {
+            attack = AT_FSTRONG; // Air Forward Smash (Charged Bomb dropping forward)
+        }
+    }
+    if (attack == AT_BAIR) {
+        if (right_strong_pressed || left_strong_pressed || strong_pressed || strong_down) {
+            spr_dir *= -1;
+            attack = AT_FSTRONG; // Air Back Smash (Charged Bomb dropping backward)
         }
     }
 }
@@ -69,10 +80,10 @@ if (attack == AT_DSTRONG) {
         set_hitbox_value(AT_DSTRONG, 1, HG_WINDOW, 3);
         set_hitbox_value(AT_DSTRONG, 1, HG_LIFETIME, 6);
         set_hitbox_value(AT_DSTRONG, 1, HG_HITBOX_X, 0);
-        set_hitbox_value(AT_DSTRONG, 1, HG_HITBOX_Y, -10);
-        set_hitbox_value(AT_DSTRONG, 1, HG_WIDTH, 48);
-        set_hitbox_value(AT_DSTRONG, 1, HG_HEIGHT, 56);
-        set_hitbox_value(AT_DSTRONG, 1, HG_SHAPE, 2);
+        set_hitbox_value(AT_DSTRONG, 1, HG_HITBOX_Y, -14);
+        set_hitbox_value(AT_DSTRONG, 1, HG_WIDTH, 198);
+        set_hitbox_value(AT_DSTRONG, 1, HG_HEIGHT, 48);
+        set_hitbox_value(AT_DSTRONG, 1, HG_SHAPE, 1);
         set_hitbox_value(AT_DSTRONG, 1, HG_PRIORITY, 3);
         set_hitbox_value(AT_DSTRONG, 1, HG_DAMAGE, 7);
         set_hitbox_value(AT_DSTRONG, 1, HG_ANGLE, 270);
@@ -146,22 +157,182 @@ if (attack == AT_DSTRONG) {
     }
 }
 
-// Aerial Left & Right Bomb Smash: face the direction pressed (Left or Right) so she drops the bomb to that side
-if (attack == AT_FAIR || attack == AT_BAIR) {
-    if (left_down || left_strong_pressed || left_stick_down) {
-        spr_dir = -1;
-    } else if (right_down || right_strong_pressed || right_stick_down) {
-        spr_dir = 1;
-    } else if (attack == AT_BAIR) {
-        spr_dir *= -1;
+// Forward / Back Strong configuration: Grounded = Lane Bullet projectile; Aerial = Charged Bomb dropping to side
+if (attack == AT_FSTRONG) {
+    if (free) {
+        // Aerial Left & Right Bomb Smash: face the direction pressed (Left or Right) so she drops the bomb to that side
+        if (left_strong_pressed || (spr_dir == -1 && (strong_pressed || strong_down))) {
+            spr_dir = -1;
+        } else if (right_strong_pressed || (spr_dir == 1 && (strong_pressed || strong_down))) {
+            spr_dir = 1;
+        }
+
+        set_attack_value(AT_FSTRONG, AG_CATEGORY, 1);
+        set_attack_value(AT_FSTRONG, AG_SPRITE, sprite_get("fstrong"));
+        set_attack_value(AT_FSTRONG, AG_AIR_SPRITE, sprite_get("fstrong"));
+        set_attack_value(AT_FSTRONG, AG_NUM_WINDOWS, 4);
+        set_attack_value(AT_FSTRONG, AG_HAS_LANDING_LAG, 1);
+        set_attack_value(AT_FSTRONG, AG_LANDING_LAG, 8);
+        set_attack_value(AT_FSTRONG, AG_STRONG_CHARGE_WINDOW, 1);
+        set_attack_value(AT_FSTRONG, AG_HURTBOX_SPRITE, sprite_get("fstrong_hurt"));
+        set_attack_value(AT_FSTRONG, AG_HURTBOX_AIR_SPRITE, sprite_get("fstrong_hurt"));
+        set_attack_value(AT_FSTRONG, AG_USES_CUSTOM_GRAVITY, 1);
+
+        set_window_value(AT_FSTRONG, 1, AG_WINDOW_LENGTH, 12);
+        set_window_value(AT_FSTRONG, 1, AG_WINDOW_ANIM_FRAMES, 8);
+        set_window_value(AT_FSTRONG, 1, AG_WINDOW_ANIM_FRAME_START, 0);
+        set_window_value(AT_FSTRONG, 1, AG_WINDOW_CUSTOM_GRAVITY, 0);
+        set_window_value(AT_FSTRONG, 1, AG_WINDOW_HAS_SFX, 1);
+        set_window_value(AT_FSTRONG, 1, AG_WINDOW_SFX, sound_get("snd_bombfall"));
+
+        set_window_value(AT_FSTRONG, 2, AG_WINDOW_LENGTH, 6);
+        set_window_value(AT_FSTRONG, 2, AG_WINDOW_ANIM_FRAMES, 2);
+        set_window_value(AT_FSTRONG, 2, AG_WINDOW_ANIM_FRAME_START, 9);
+        set_window_value(AT_FSTRONG, 2, AG_WINDOW_CUSTOM_GRAVITY, 0);
+        set_window_value(AT_FSTRONG, 2, AG_WINDOW_HAS_SFX, 1);
+        set_window_value(AT_FSTRONG, 2, AG_WINDOW_SFX, sound_get("snd_bomb"));
+
+        set_window_value(AT_FSTRONG, 3, AG_WINDOW_LENGTH, 6);
+        set_window_value(AT_FSTRONG, 3, AG_WINDOW_ANIM_FRAMES, 2);
+        set_window_value(AT_FSTRONG, 3, AG_WINDOW_ANIM_FRAME_START, 11);
+        set_window_value(AT_FSTRONG, 3, AG_WINDOW_CUSTOM_GRAVITY, 0);
+
+        set_window_value(AT_FSTRONG, 4, AG_WINDOW_LENGTH, 9);
+        set_window_value(AT_FSTRONG, 4, AG_WINDOW_ANIM_FRAMES, 3);
+        set_window_value(AT_FSTRONG, 4, AG_WINDOW_ANIM_FRAME_START, 13);
+        set_window_value(AT_FSTRONG, 4, AG_WINDOW_CUSTOM_GRAVITY, 0);
+        set_window_value(AT_FSTRONG, 4, AG_WINDOW_HAS_WHIFFLAG, 1);
+
+        set_num_hitboxes(AT_FSTRONG, 2);
+
+        set_hitbox_value(AT_FSTRONG, 1, HG_HITBOX_TYPE, 1);
+        set_hitbox_value(AT_FSTRONG, 1, HG_WINDOW, 3);
+        set_hitbox_value(AT_FSTRONG, 1, HG_LIFETIME, 6);
+        set_hitbox_value(AT_FSTRONG, 1, HG_HITBOX_X, 66);
+        set_hitbox_value(AT_FSTRONG, 1, HG_HITBOX_Y, -49);
+        set_hitbox_value(AT_FSTRONG, 1, HG_WIDTH, 46);
+        set_hitbox_value(AT_FSTRONG, 1, HG_HEIGHT, 103);
+        set_hitbox_value(AT_FSTRONG, 1, HG_SHAPE, 1);
+        set_hitbox_value(AT_FSTRONG, 1, HG_PRIORITY, 3);
+        set_hitbox_value(AT_FSTRONG, 1, HG_DAMAGE, 4);
+        set_hitbox_value(AT_FSTRONG, 1, HG_ANGLE, 45);
+        set_hitbox_value(AT_FSTRONG, 1, HG_BASE_KNOCKBACK, 7);
+        set_hitbox_value(AT_FSTRONG, 1, HG_KNOCKBACK_SCALING, 0.8);
+        set_hitbox_value(AT_FSTRONG, 1, HG_BASE_HITPAUSE, 10);
+        set_hitbox_value(AT_FSTRONG, 1, HG_HITPAUSE_SCALING, 0.6);
+        set_hitbox_value(AT_FSTRONG, 1, HG_VISUAL_EFFECT, 304);
+        set_hitbox_value(AT_FSTRONG, 1, HG_VISUAL_EFFECT_Y_OFFSET, -10);
+        set_hitbox_value(AT_FSTRONG, 1, HG_HIT_SFX, sound_get("snd_hurt1"));
+        set_hitbox_value(AT_FSTRONG, 1, HG_HIT_LOCKOUT, 10);
+
+        set_hitbox_value(AT_FSTRONG, 2, HG_HITBOX_TYPE, 1);
+        set_hitbox_value(AT_FSTRONG, 2, HG_WINDOW, 3);
+        set_hitbox_value(AT_FSTRONG, 2, HG_LIFETIME, 6);
+        set_hitbox_value(AT_FSTRONG, 2, HG_HITBOX_X, 70);
+        set_hitbox_value(AT_FSTRONG, 2, HG_HITBOX_Y, -33);
+        set_hitbox_value(AT_FSTRONG, 2, HG_WIDTH, 160);
+        set_hitbox_value(AT_FSTRONG, 2, HG_HEIGHT, 29);
+        set_hitbox_value(AT_FSTRONG, 2, HG_SHAPE, 1);
+        set_hitbox_value(AT_FSTRONG, 2, HG_PRIORITY, 3);
+        set_hitbox_value(AT_FSTRONG, 2, HG_DAMAGE, 4);
+        set_hitbox_value(AT_FSTRONG, 2, HG_ANGLE, 45);
+        set_hitbox_value(AT_FSTRONG, 2, HG_BASE_KNOCKBACK, 7);
+        set_hitbox_value(AT_FSTRONG, 2, HG_KNOCKBACK_SCALING, 0.8);
+        set_hitbox_value(AT_FSTRONG, 2, HG_BASE_HITPAUSE, 10);
+        set_hitbox_value(AT_FSTRONG, 2, HG_HITPAUSE_SCALING, 0.6);
+        set_hitbox_value(AT_FSTRONG, 2, HG_VISUAL_EFFECT, 304);
+        set_hitbox_value(AT_FSTRONG, 2, HG_VISUAL_EFFECT_Y_OFFSET, -10);
+        set_hitbox_value(AT_FSTRONG, 2, HG_HIT_SFX, sound_get("snd_hurt1"));
+        set_hitbox_value(AT_FSTRONG, 2, HG_HIT_LOCKOUT, 10);
+    } else {
+        // Grounded FStrong: Lane Bullet Projectile
+        set_attack_value(AT_FSTRONG, AG_CATEGORY, 0);
+        set_attack_value(AT_FSTRONG, AG_SPRITE, sprite_get("fair"));
+        set_attack_value(AT_FSTRONG, AG_AIR_SPRITE, sprite_get("fair"));
+        set_attack_value(AT_FSTRONG, AG_NUM_WINDOWS, 3);
+        set_attack_value(AT_FSTRONG, AG_HAS_LANDING_LAG, 3);
+        set_attack_value(AT_FSTRONG, AG_STRONG_CHARGE_WINDOW, 1);
+        set_attack_value(AT_FSTRONG, AG_HURTBOX_SPRITE, sprite_get("fair_hurt"));
+        set_attack_value(AT_FSTRONG, AG_HURTBOX_AIR_SPRITE, sprite_get("fair_hurt"));
+        set_attack_value(AT_FSTRONG, AG_USES_CUSTOM_GRAVITY, 0);
+
+        set_window_value(AT_FSTRONG, 1, AG_WINDOW_LENGTH, 8);
+        set_window_value(AT_FSTRONG, 1, AG_WINDOW_ANIM_FRAMES, 3);
+        set_window_value(AT_FSTRONG, 1, AG_WINDOW_ANIM_FRAME_START, 0);
+        set_window_value(AT_FSTRONG, 1, AG_WINDOW_HAS_CUSTOM_FRICTION, 1);
+        set_window_value(AT_FSTRONG, 1, AG_WINDOW_CUSTOM_GROUND_FRICTION, 0.15);
+        set_window_value(AT_FSTRONG, 1, AG_WINDOW_HAS_SFX, 1);
+        set_window_value(AT_FSTRONG, 1, AG_WINDOW_SFX, sound_get("snd_smallswing"));
+        set_window_value(AT_FSTRONG, 1, AG_WINDOW_SFX_FRAME, 4);
+
+        set_window_value(AT_FSTRONG, 2, AG_WINDOW_LENGTH, 4);
+        set_window_value(AT_FSTRONG, 2, AG_WINDOW_ANIM_FRAMES, 1);
+        set_window_value(AT_FSTRONG, 2, AG_WINDOW_ANIM_FRAME_START, 3);
+        set_window_value(AT_FSTRONG, 2, AG_WINDOW_HAS_SFX, 1);
+        set_window_value(AT_FSTRONG, 2, AG_WINDOW_SFX, sound_get("snd_pink_throw"));
+        set_window_value(AT_FSTRONG, 2, AG_WINDOW_SFX_FRAME, 1);
+
+        set_window_value(AT_FSTRONG, 3, AG_WINDOW_LENGTH, 12);
+        set_window_value(AT_FSTRONG, 3, AG_WINDOW_ANIM_FRAMES, 2);
+        set_window_value(AT_FSTRONG, 3, AG_WINDOW_ANIM_FRAME_START, 4);
+        set_window_value(AT_FSTRONG, 3, AG_WINDOW_HAS_WHIFFLAG, 1);
+
+        set_num_hitboxes(AT_FSTRONG, 2);
+
+        // Hitbox 1: Lane Bullet short-ranged projectile
+        set_hitbox_value(AT_FSTRONG, 1, HG_HITBOX_TYPE, 2);
+        set_hitbox_value(AT_FSTRONG, 1, HG_WINDOW, 2);
+        set_hitbox_value(AT_FSTRONG, 1, HG_LIFETIME, 18);
+        set_hitbox_value(AT_FSTRONG, 1, HG_HITBOX_X, 42);
+        set_hitbox_value(AT_FSTRONG, 1, HG_HITBOX_Y, -42);
+        set_hitbox_value(AT_FSTRONG, 1, HG_WIDTH, 42);
+        set_hitbox_value(AT_FSTRONG, 1, HG_HEIGHT, 42);
+        set_hitbox_value(AT_FSTRONG, 1, HG_PRIORITY, 3);
+        set_hitbox_value(AT_FSTRONG, 1, HG_DAMAGE, 5);
+        set_hitbox_value(AT_FSTRONG, 1, HG_ANGLE, 45);
+        set_hitbox_value(AT_FSTRONG, 1, HG_BASE_KNOCKBACK, 4.5);
+        set_hitbox_value(AT_FSTRONG, 1, HG_KNOCKBACK_SCALING, 0.4);
+        set_hitbox_value(AT_FSTRONG, 1, HG_BASE_HITPAUSE, 6);
+        set_hitbox_value(AT_FSTRONG, 1, HG_HITPAUSE_SCALING, 0.3);
+        set_hitbox_value(AT_FSTRONG, 1, HG_VISUAL_EFFECT, 301);
+        set_hitbox_value(AT_FSTRONG, 1, HG_HIT_SFX, sound_get("snd_damage"));
+        set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_SPRITE, sprite_get("lane_bullet"));
+        set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_MASK, sprite_get("lane_bullet_mask"));
+        set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_ANIM_SPEED, 0.25);
+        set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_HSPEED, 6.5);
+        set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_VSPEED, 0);
+        set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_GRAVITY, 0);
+        set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_GROUND_BEHAVIOR, 1);
+        set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_GROUND_FRICTION, 0);
+        set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_WALL_BEHAVIOR, 0);
+        set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_IS_TRANSCENDENT, 1);
+
+        // Hitbox 2: Close wand swing melee hit
+        set_hitbox_value(AT_FSTRONG, 2, HG_HITBOX_TYPE, 1);
+        set_hitbox_value(AT_FSTRONG, 2, HG_WINDOW, 2);
+        set_hitbox_value(AT_FSTRONG, 2, HG_LIFETIME, 3);
+        set_hitbox_value(AT_FSTRONG, 2, HG_HITBOX_X, 26);
+        set_hitbox_value(AT_FSTRONG, 2, HG_HITBOX_Y, -44);
+        set_hitbox_value(AT_FSTRONG, 2, HG_WIDTH, 48);
+        set_hitbox_value(AT_FSTRONG, 2, HG_HEIGHT, 60);
+        set_hitbox_value(AT_FSTRONG, 2, HG_PRIORITY, 2);
+        set_hitbox_value(AT_FSTRONG, 2, HG_DAMAGE, 3);
+        set_hitbox_value(AT_FSTRONG, 2, HG_ANGLE, 45);
+        set_hitbox_value(AT_FSTRONG, 2, HG_BASE_KNOCKBACK, 4);
+        set_hitbox_value(AT_FSTRONG, 2, HG_KNOCKBACK_SCALING, 0.2);
+        set_hitbox_value(AT_FSTRONG, 2, HG_BASE_HITPAUSE, 5);
+        set_hitbox_value(AT_FSTRONG, 2, HG_HIT_SFX, sound_get("snd_hurt1"));
     }
-    attack = AT_FAIR;
 }
 
-// Neutral A (Kiss with Heart): Roll for Crit (10% chance) and apply corresponding hitbox stats
+// Neutral A (Kiss with Heart): Roll for Crit (25% base chance, +5% in Tier 2/3) and apply corresponding hitbox stats
 if (attack == AT_JAB) {
+    var eff_crit_chance = jab_crit_chance;
+    if (doki_tier >= 2) {
+        eff_crit_chance += 5; // Tier 2+ bonus: 30% Crit chance!
+    }
     var crit_roll = random_func((get_gameplay_time() + player * 7) % 25, 100, true);
-    jab_is_crit = (crit_roll < jab_crit_chance);
+    jab_is_crit = (crit_roll < eff_crit_chance);
 
     if (jab_is_crit) {
         set_hitbox_value(AT_JAB, 1, HG_DAMAGE, 10);

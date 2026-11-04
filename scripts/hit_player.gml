@@ -20,7 +20,33 @@ if (instance_exists(hit_player_obj) && !hit_player_obj.clone && hit_player_obj.p
         }
     }
 
-    // Record Dummy hit (AT_DSPECIAL) or Kitty hit (AT_NSPECIAL / AT_DAIR) when Battle Box is unlocked (60%+) and off cooldown
+    // Doki Meter Building:
+    var dmg_dealt = my_hitboxID.damage;
+
+    // Tier 2 (Purple) Bonus: Pink deals +2 extra damage!
+    if (doki_tier == 2) {
+        take_damage(hit_player_obj.player, player, 2);
+        dmg_dealt += 2;
+    }
+
+    var meter_gain = dmg_dealt;
+
+    // Bonus meter on Kiss Critical Hit: +5%
+    if (my_hitboxID.attack == AT_JAB && jab_is_crit) {
+        meter_gain += 5;
+    }
+
+    // Bonus meter on Marking Hit (Dummy or Kitty): +8%
+    if (my_hitboxID.attack == AT_DSPECIAL || my_hitboxID.attack == AT_NSPECIAL || my_hitboxID.attack == AT_DAIR) {
+        meter_gain += 8;
+    }
+
+    doki_meter = min(100, doki_meter + meter_gain);
+    if (doki_meter >= 100) {
+        bb_unlocked = true;
+    }
+
+    // Record Dummy hit (AT_DSPECIAL) or Kitty hit (AT_NSPECIAL / AT_DAIR) when Battle Box is off cooldown
     if (!bb_active && bb_unlocked && bb_cooldown <= 0) {
         if (my_hitboxID.attack == AT_DSPECIAL) {
             bb_dummy_hit_timer[vp] = bb_quick_window;
@@ -36,6 +62,10 @@ if (instance_exists(hit_player_obj) && !hit_player_obj.clone && hit_player_obj.p
     if (!bb_active && bb_unlocked && bb_cooldown <= 0 && bb_dummy_hit_timer[vp] > 0 && bb_kitty_hit_timer[vp] > 0) {
         bb_dummy_hit_timer[vp] = 0;
         bb_kitty_hit_timer[vp] = 0;
+
+        // Consumes Doki Meter!
+        doki_meter = 0;
+        bb_unlocked = false;
 
         bb_active = true;
         bb_timer = 0;

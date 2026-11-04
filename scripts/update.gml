@@ -32,15 +32,53 @@ if (state != PS_PARRY) {
     parry_success_timer = 0;
 }
 
-// She does not spawn with her Ultimate; reset on respawn/death and unlock when she reaches 60% damage
+// Doki Meter & Ultimate state tracking:
+// Taking damage drains Doki Meter (-0.5% per damage taken)
+var cur_dmg = get_player_damage(player);
+if (cur_dmg > prev_player_damage) {
+    var diff = cur_dmg - prev_player_damage;
+    doki_meter = max(0, doki_meter - diff * 0.5);
+}
+prev_player_damage = cur_dmg;
+
+// Doki Meter Tiers:
+// Tier 1: 0..33% (Green)
+// Tier 2: 34..66% (Purple - Heart aura, +5% Crit chance, +2 damage on hits)
+// Tier 3: 67..100% (Pink - at 100% MAX, Battle Box is earned & unlocked!)
+var old_tier = doki_tier;
+if (doki_meter >= 67) {
+    doki_tier = 3;
+} else if (doki_meter >= 34) {
+    doki_tier = 2;
+} else {
+    doki_tier = 1;
+}
+
+if (doki_tier != old_tier) {
+    doki_tier_flash = 20;
+    if (doki_tier == 3 && doki_meter >= 100) {
+        sound_play(sound_get("heart_electric"));
+    } else if (doki_tier == 2) {
+        sound_play(sound_get("sfx_mark"));
+    }
+}
+if (doki_tier_flash > 0) doki_tier_flash--;
+
+if (doki_meter >= 100) {
+    bb_unlocked = true;
+} else {
+    bb_unlocked = false;
+}
+
+// Reset on respawn / death / spawn: Earn ult via Doki Meter
 if (state == PS_RESPAWN || state == PS_SPAWN || state == PS_DEAD) {
     bb_unlocked = false;
     bb_cooldown = 0;
+    doki_meter = 0;
+    doki_tier = 1;
+    prev_player_damage = 0;
     bb_dummy_hit_timer = [0, 0, 0, 0, 0];
     bb_kitty_hit_timer = [0, 0, 0, 0, 0];
-} else if (!bb_unlocked && get_player_damage(player) >= 60) {
-    bb_unlocked = true;
-    bb_cooldown = 0;
 }
 
 // Allow Down Taunt out of crouch
@@ -192,7 +230,7 @@ if (bb_active) {
                 sound_play(sound_get("snd_pink_mew"));
             }
 
-            // Update Cat Musical Notes & check collisions (5 damage, cut in half from 10)
+            // Update Cat Musical Notes & check collisions (7 damage, boosted 30%)
             for (var i = 0; i < array_length(bb_objects); i++) {
                 var obj = bb_objects[i];
                 if (obj.active && obj.type == 1) {
@@ -201,7 +239,7 @@ if (bb_active) {
                     if (abs(obj.x) > 148) {
                         obj.active = false;
                     } else if (bb_soul_invuln <= 0 && obj.lane == bb_soul_lane && abs(obj.x - bb_soul_x) < 22) {
-                        take_damage(bb_victim.player, player, 5);
+                        take_damage(bb_victim.player, player, 7);
                         bb_soul_invuln = 28;
                         obj.active = false;
                         sound_play(sound_get("snd_hurt1"));
@@ -262,7 +300,7 @@ if (bb_active) {
                     }
                     if (obj.timer >= 31 && obj.timer <= 46 && !obj.hit_done && bb_soul_invuln <= 0) {
                         if (bb_soul_gx == obj.gx || bb_soul_gy == obj.gy) {
-                            take_damage(bb_victim.player, player, 8);
+                            take_damage(bb_victim.player, player, 11);
                             obj.hit_done = true;
                             bb_soul_invuln = 30;
                             sound_play(sound_get("snd_hurt1"));
@@ -298,17 +336,17 @@ if (bb_active) {
 
 // Aerial Strong inputs:
 // - Down + Strong does Aerial Down Smash (AT_DSTRONG when free: slowly falls, charges bomb, spikes downward, free fall after)
-// - Left / Right + Strong does Aerial Left/Right Smash (AT_FAIR: slowly falls, charges bomb, drops bomb left or right, free fall after)
+// - Left / Right + Strong does Aerial Left/Right Smash (AT_FSTRONG when free: slowly falls, charges bomb, drops bomb left or right, free fall after)
 // - Up + Strong / Neutral Strong does Ghost Flight (AT_USPECIAL)
 if (!bb_active && free && (state == PS_FIRST_JUMP || state == PS_DOUBLE_JUMP || state == PS_IDLE_AIR || state == PS_WALL_JUMP)) {
     if (down_strong_pressed || (down_down && (strong_pressed || strong_down))) {
         set_attack(AT_DSTRONG);
     } else if (left_strong_pressed || (left_down && (strong_pressed || strong_down))) {
         spr_dir = -1;
-        set_attack(AT_FAIR);
+        set_attack(AT_FSTRONG);
     } else if (right_strong_pressed || (right_down && (strong_pressed || strong_down))) {
         spr_dir = 1;
-        set_attack(AT_FAIR);
+        set_attack(AT_FSTRONG);
     } else if (move_cooldown[AT_USPECIAL] == 0 && (up_strong_pressed || (up_down && (strong_pressed || strong_down)) || strong_pressed || strong_down)) {
         set_attack(AT_USPECIAL);
     }

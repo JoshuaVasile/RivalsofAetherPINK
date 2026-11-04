@@ -2,6 +2,23 @@
 
 user_event(12);
 
+// Tier 2 (Purple) Heart Aura & Tier 3 MAX Radiant Pulse
+if (doki_tier == 2 && state != PS_DEAD && state != PS_RESPAWN) {
+    var gt = get_gameplay_time();
+    var aura_alpha = 0.5 + sin(gt * 0.15) * 0.2;
+    var mark_spr = sprite_get("bb_mark");
+    var bob1 = sin(gt * 0.15) * 4;
+    var bob2 = cos(gt * 0.15) * 4;
+    draw_sprite_ext(mark_spr, 0, x - 18, y - 36 + bob1, 0.45, 0.45, gt * 2, c_white, aura_alpha * 0.7);
+    draw_sprite_ext(mark_spr, 0, x + 18, y - 36 - bob1, 0.45, 0.45, -gt * 2, c_white, aura_alpha * 0.7);
+    draw_sprite_ext(mark_spr, 0, x + bob2, y - 56, 0.5, 0.5, 0, c_white, aura_alpha * 0.85);
+} else if (doki_meter >= 100 && state != PS_DEAD && state != PS_RESPAWN) {
+    var gt = get_gameplay_time();
+    var max_alpha = 0.55 + sin(gt * 0.3) * 0.25;
+    var mark_spr = sprite_get("bb_mark");
+    draw_sprite_ext(mark_spr, 1, x, y - char_height - 18, 0.75 + sin(gt * 0.2) * 0.1, 0.75 + sin(gt * 0.2) * 0.1, 0, c_white, max_alpha);
+}
+
 // Draw the two Doki hearts above any opponent currently marked with 1 of the 2 hits (Dummy or Kitty)
 if (!bb_active && bb_unlocked && bb_cooldown <= 0) {
     var mark_spr = sprite_get("bb_mark");

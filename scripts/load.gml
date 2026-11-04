@@ -96,6 +96,8 @@ sprite_change_offset("plat", 93, 14);
 sprite_change_offset("ghost", 96, 190);
 sprite_change_offset("ghost_cooldown", 96, 190);
 sprite_change_offset("doki", 96, 190);
+sprite_change_offset("doki_meter_bg", 0, 0);
+sprite_change_offset("doki_meter_fill", 0, 0);
 sprite_change_offset("cat", 96, 190);
 sprite_change_offset("dummy", 96, 190);
 sprite_change_offset("dummy_cooldown", 96, 190);

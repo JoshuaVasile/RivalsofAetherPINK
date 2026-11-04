@@ -32,17 +32,27 @@ ghost_cooldown_max = 180;
 bb_active = false;
 bb_timer = 0;
 bb_max_time = 340;     // 1.5 seconds (90 frames) longer than before (was 250)
-bb_mode = 0;           // 1 = Cat Notes on Strings (5 dmg), 2 = Grid Bombs (8 dmg)
+bb_mode = 0;           // 1 = Cat Notes on Strings (7 dmg), 2 = Grid Bombs (11 dmg)
 bb_next_mode = 1;      // Alternates default mode if Pink doesn't manually pick
 bb_box_x = 0;
 bb_box_y = 0;
 bb_victim = noone;
-bb_unlocked = false;   // Does not spawn with ultimate; unlocks at 60% damage
+bb_unlocked = false;   // Locked until Doki Meter reaches 100% (Tier 3 MAX)
 bb_cooldown = 0;
 bb_cooldown_max = 2400; // 40 seconds (2400 frames) cooldown after use
 bb_quick_window = 240; // 4 seconds to land both Dummy and Kitty on the same opponent
 bb_dummy_hit_timer = [0, 0, 0, 0, 0];
 bb_kitty_hit_timer = [0, 0, 0, 0, 0];
+
+// Doki Meter System:
+// Builds on dealing damage (+1% per dmg), drains on taking damage (-0.5% per dmg)
+// Tier 1: 0..33% (Green)
+// Tier 2: 34..66% (Purple - Heart aura, +5% Crit chance, +2 damage on hits)
+// Tier 3: 67..100% (Pink - At 100% MAX, Battle Box is earned & unlocked!)
+doki_meter = 0;
+doki_tier = 1;
+doki_tier_flash = 0;
+prev_player_damage = 0;
 
 // Soul Heart state inside the Battle Box
 bb_soul_x = 0;

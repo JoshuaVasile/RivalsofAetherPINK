@@ -53,8 +53,7 @@ if (attack == AT_USPECIAL) {
             }
         } else if ((spr_dir == 1 && (left_down || left_stick_pressed)) || (spr_dir == -1 && (right_down || right_stick_pressed))) {
             if (attack_pressed || right_stick_pressed || left_stick_pressed) {
-                target_atk = AT_FAIR;
-                spr_dir *= -1;
+                target_atk = AT_BAIR;
                 do_cancel = true;
             }
         } else if (attack_pressed) {
@@ -123,9 +122,9 @@ if (attack == AT_NSPECIAL) {
     move_cooldown[AT_NSPECIAL] = 16;
 }
 
-// Aerial Bomb Smashes: Air Down Smash (AT_DSTRONG when free) & Air Left/Right Smash (AT_FAIR / AT_BAIR)
+// Aerial Bomb Smashes: Air Down Smash (AT_DSTRONG when free) & Air Left/Right Smash (AT_FSTRONG when free)
 // She slowly falls as she charges and drops them, then goes into free fall (PS_PRATFALL)!
-if (((attack == AT_DSTRONG && free) || attack == AT_FAIR || attack == AT_BAIR) && free) {
+if ((attack == AT_DSTRONG || attack == AT_FSTRONG) && free) {
     hsp = 0;
     vsp = 0.8; // Very slow fall while charging and dropping the bomb
     can_fast_fall = false;

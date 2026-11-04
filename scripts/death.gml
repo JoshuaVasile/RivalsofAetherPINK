@@ -1,8 +1,11 @@
 // death is a script that is called when your character reaches a blastzone and is knocked out.
 sound_play(sound_get("pink_trip"));
 
-// Ultimate reset on death: refresh Battle Box cooldown so she gets it back to use again
+// Ultimate & Doki Meter reset on death
 bb_cooldown = 0;
+bb_unlocked = false;
+doki_meter = 0;
+prev_player_damage = 0;
 heal_popup_timer = 0;
 for (var p = 1; p <= 4; p++) {
     bb_dummy_hit_timer[p] = 0;
