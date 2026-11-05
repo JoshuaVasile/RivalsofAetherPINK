@@ -1,3 +1,43 @@
+// X Kitty (NSpecial): anti-spam scaling, smaller sizes, 5 casts before 5.5-second lockout
+if (attack == AT_NSPECIAL) {
+    if (nspecial_lockout > 0) {
+        nspecial_hud_nudge = 8;
+        attack = AT_NO_ATTACK;
+    } else {
+        // Base damage starts at 5 and steps down by 1 per consecutive cast (5 -> 4 -> 3 -> 2 -> 1)
+        var k_dmg = 5;
+        var k_w = 50;
+        var k_h = 44;
+        var k_spr = sprite_get("cat");
+        if (nspecial_fatigue == 1) {
+            k_dmg = 4;
+            k_w = 50;
+            k_h = 44;
+            k_spr = sprite_get("cat");
+        } else if (nspecial_fatigue == 2) {
+            k_dmg = 3;
+            k_w = 36;
+            k_h = 32;
+            k_spr = sprite_get("cat_small");
+        } else if (nspecial_fatigue == 3) {
+            k_dmg = 2;
+            k_w = 28;
+            k_h = 25;
+            k_spr = sprite_get("cat_tiny");
+        } else if (nspecial_fatigue >= 4) {
+            k_dmg = 1;
+            k_w = 24;
+            k_h = 22;
+            k_spr = sprite_get("cat_tiny");
+        }
+        set_hitbox_value(AT_NSPECIAL, 1, HG_DAMAGE, k_dmg);
+        set_hitbox_value(AT_NSPECIAL, 1, HG_WIDTH, k_w);
+        set_hitbox_value(AT_NSPECIAL, 1, HG_HEIGHT, k_h);
+        set_hitbox_value(AT_NSPECIAL, 1, HG_PROJECTILE_SPRITE, k_spr);
+        set_hitbox_value(AT_NSPECIAL, 1, HG_PROJECTILE_MASK, k_spr);
+    }
+}
+
 // set_attack runs frame 0 of any attack.
 
 air_charge_timer = 0;
@@ -245,83 +285,141 @@ if (attack == AT_FSTRONG) {
         set_hitbox_value(AT_FSTRONG, 2, HG_HIT_SFX, sound_get("snd_hurt1"));
         set_hitbox_value(AT_FSTRONG, 2, HG_HIT_LOCKOUT, 10);
     } else {
-        // Grounded FStrong: Lane Bullet Projectile
-        set_attack_value(AT_FSTRONG, AG_CATEGORY, 0);
-        set_attack_value(AT_FSTRONG, AG_SPRITE, sprite_get("fair"));
-        set_attack_value(AT_FSTRONG, AG_AIR_SPRITE, sprite_get("fair"));
-        set_attack_value(AT_FSTRONG, AG_NUM_WINDOWS, 3);
-        set_attack_value(AT_FSTRONG, AG_HAS_LANDING_LAG, 3);
-        set_attack_value(AT_FSTRONG, AG_STRONG_CHARGE_WINDOW, 1);
-        set_attack_value(AT_FSTRONG, AG_HURTBOX_SPRITE, sprite_get("fair_hurt"));
-        set_attack_value(AT_FSTRONG, AG_HURTBOX_AIR_SPRITE, sprite_get("fair_hurt"));
-        set_attack_value(AT_FSTRONG, AG_USES_CUSTOM_GRAVITY, 0);
+        // Grounded FStrong: Lane Bullet Projectile (anti-spam scaling & 7-second lockout)
+        if (fstrong_lockout > 0) {
+            fstrong_hud_nudge = 8;
+            attack = AT_NO_ATTACK;
+        } else {
+            set_attack_value(AT_FSTRONG, AG_CATEGORY, 0);
+            set_attack_value(AT_FSTRONG, AG_SPRITE, sprite_get("fair"));
+            set_attack_value(AT_FSTRONG, AG_AIR_SPRITE, sprite_get("fair"));
+            set_attack_value(AT_FSTRONG, AG_NUM_WINDOWS, 3);
+            set_attack_value(AT_FSTRONG, AG_HAS_LANDING_LAG, 3);
+            set_attack_value(AT_FSTRONG, AG_STRONG_CHARGE_WINDOW, 1);
+            set_attack_value(AT_FSTRONG, AG_HURTBOX_SPRITE, sprite_get("fair_hurt"));
+            set_attack_value(AT_FSTRONG, AG_HURTBOX_AIR_SPRITE, sprite_get("fair_hurt"));
+            set_attack_value(AT_FSTRONG, AG_USES_CUSTOM_GRAVITY, 0);
 
-        set_window_value(AT_FSTRONG, 1, AG_WINDOW_LENGTH, 8);
-        set_window_value(AT_FSTRONG, 1, AG_WINDOW_ANIM_FRAMES, 3);
-        set_window_value(AT_FSTRONG, 1, AG_WINDOW_ANIM_FRAME_START, 0);
-        set_window_value(AT_FSTRONG, 1, AG_WINDOW_HAS_CUSTOM_FRICTION, 1);
-        set_window_value(AT_FSTRONG, 1, AG_WINDOW_CUSTOM_GROUND_FRICTION, 0.15);
-        set_window_value(AT_FSTRONG, 1, AG_WINDOW_HAS_SFX, 1);
-        set_window_value(AT_FSTRONG, 1, AG_WINDOW_SFX, sound_get("snd_smallswing"));
-        set_window_value(AT_FSTRONG, 1, AG_WINDOW_SFX_FRAME, 4);
+            set_window_value(AT_FSTRONG, 1, AG_WINDOW_LENGTH, 8);
+            set_window_value(AT_FSTRONG, 1, AG_WINDOW_ANIM_FRAMES, 3);
+            set_window_value(AT_FSTRONG, 1, AG_WINDOW_ANIM_FRAME_START, 0);
+            set_window_value(AT_FSTRONG, 1, AG_WINDOW_HAS_CUSTOM_FRICTION, 1);
+            set_window_value(AT_FSTRONG, 1, AG_WINDOW_CUSTOM_GROUND_FRICTION, 0.15);
+            set_window_value(AT_FSTRONG, 1, AG_WINDOW_HAS_SFX, 1);
+            set_window_value(AT_FSTRONG, 1, AG_WINDOW_SFX, sound_get("snd_smallswing"));
+            set_window_value(AT_FSTRONG, 1, AG_WINDOW_SFX_FRAME, 4);
 
-        set_window_value(AT_FSTRONG, 2, AG_WINDOW_LENGTH, 4);
-        set_window_value(AT_FSTRONG, 2, AG_WINDOW_ANIM_FRAMES, 1);
-        set_window_value(AT_FSTRONG, 2, AG_WINDOW_ANIM_FRAME_START, 3);
-        set_window_value(AT_FSTRONG, 2, AG_WINDOW_HAS_SFX, 1);
-        set_window_value(AT_FSTRONG, 2, AG_WINDOW_SFX, sound_get("snd_pink_throw"));
-        set_window_value(AT_FSTRONG, 2, AG_WINDOW_SFX_FRAME, 1);
+            set_window_value(AT_FSTRONG, 2, AG_WINDOW_LENGTH, 4);
+            set_window_value(AT_FSTRONG, 2, AG_WINDOW_ANIM_FRAMES, 1);
+            set_window_value(AT_FSTRONG, 2, AG_WINDOW_ANIM_FRAME_START, 3);
+            set_window_value(AT_FSTRONG, 2, AG_WINDOW_HAS_SFX, 1);
+            set_window_value(AT_FSTRONG, 2, AG_WINDOW_SFX, sound_get("snd_pink_throw"));
+            set_window_value(AT_FSTRONG, 2, AG_WINDOW_SFX_FRAME, 1);
 
-        set_window_value(AT_FSTRONG, 3, AG_WINDOW_LENGTH, 12);
-        set_window_value(AT_FSTRONG, 3, AG_WINDOW_ANIM_FRAMES, 2);
-        set_window_value(AT_FSTRONG, 3, AG_WINDOW_ANIM_FRAME_START, 4);
-        set_window_value(AT_FSTRONG, 3, AG_WINDOW_HAS_WHIFFLAG, 1);
+            set_window_value(AT_FSTRONG, 3, AG_WINDOW_LENGTH, 12);
+            set_window_value(AT_FSTRONG, 3, AG_WINDOW_ANIM_FRAMES, 2);
+            set_window_value(AT_FSTRONG, 3, AG_WINDOW_ANIM_FRAME_START, 4);
+            set_window_value(AT_FSTRONG, 3, AG_WINDOW_HAS_WHIFFLAG, 1);
 
-        set_num_hitboxes(AT_FSTRONG, 2);
+            set_num_hitboxes(AT_FSTRONG, 2);
 
-        // Hitbox 1: Lane Bullet short-ranged projectile
-        set_hitbox_value(AT_FSTRONG, 1, HG_HITBOX_TYPE, 2);
-        set_hitbox_value(AT_FSTRONG, 1, HG_WINDOW, 2);
-        set_hitbox_value(AT_FSTRONG, 1, HG_LIFETIME, 18);
-        set_hitbox_value(AT_FSTRONG, 1, HG_HITBOX_X, 42);
-        set_hitbox_value(AT_FSTRONG, 1, HG_HITBOX_Y, -42);
-        set_hitbox_value(AT_FSTRONG, 1, HG_WIDTH, 42);
-        set_hitbox_value(AT_FSTRONG, 1, HG_HEIGHT, 42);
-        set_hitbox_value(AT_FSTRONG, 1, HG_PRIORITY, 3);
-        set_hitbox_value(AT_FSTRONG, 1, HG_DAMAGE, 5);
-        set_hitbox_value(AT_FSTRONG, 1, HG_ANGLE, 45);
-        set_hitbox_value(AT_FSTRONG, 1, HG_BASE_KNOCKBACK, 4.5);
-        set_hitbox_value(AT_FSTRONG, 1, HG_KNOCKBACK_SCALING, 0.4);
-        set_hitbox_value(AT_FSTRONG, 1, HG_BASE_HITPAUSE, 6);
-        set_hitbox_value(AT_FSTRONG, 1, HG_HITPAUSE_SCALING, 0.3);
-        set_hitbox_value(AT_FSTRONG, 1, HG_VISUAL_EFFECT, 301);
-        set_hitbox_value(AT_FSTRONG, 1, HG_HIT_SFX, sound_get("snd_damage"));
-        set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_SPRITE, sprite_get("lane_bullet"));
-        set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_MASK, sprite_get("lane_bullet_mask"));
-        set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_ANIM_SPEED, 0.25);
-        set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_HSPEED, 6.5);
-        set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_VSPEED, 0);
-        set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_GRAVITY, 0);
-        set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_GROUND_BEHAVIOR, 1);
-        set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_GROUND_FRICTION, 0);
-        set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_WALL_BEHAVIOR, 0);
-        set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_IS_TRANSCENDENT, 1);
+            // Anti-spam scaling: base 5 damage stepping down by 1 each cast (5 -> 4 -> 3 -> 2 -> 1)
+            var b_dmg = 5;
+            var b_size = 28;
+            var b_spr = sprite_get("lane_bullet");
+            var b_mask = sprite_get("lane_bullet_mask");
+            var b_spd = 4.2;
+            var b_life = 13;
+            var m_dmg = 3;
+            var m_w = 32;
+            var m_h = 44;
 
-        // Hitbox 2: Close wand swing melee hit
-        set_hitbox_value(AT_FSTRONG, 2, HG_HITBOX_TYPE, 1);
-        set_hitbox_value(AT_FSTRONG, 2, HG_WINDOW, 2);
-        set_hitbox_value(AT_FSTRONG, 2, HG_LIFETIME, 3);
-        set_hitbox_value(AT_FSTRONG, 2, HG_HITBOX_X, 26);
-        set_hitbox_value(AT_FSTRONG, 2, HG_HITBOX_Y, -44);
-        set_hitbox_value(AT_FSTRONG, 2, HG_WIDTH, 48);
-        set_hitbox_value(AT_FSTRONG, 2, HG_HEIGHT, 60);
-        set_hitbox_value(AT_FSTRONG, 2, HG_PRIORITY, 2);
-        set_hitbox_value(AT_FSTRONG, 2, HG_DAMAGE, 3);
-        set_hitbox_value(AT_FSTRONG, 2, HG_ANGLE, 45);
-        set_hitbox_value(AT_FSTRONG, 2, HG_BASE_KNOCKBACK, 4);
-        set_hitbox_value(AT_FSTRONG, 2, HG_KNOCKBACK_SCALING, 0.2);
-        set_hitbox_value(AT_FSTRONG, 2, HG_BASE_HITPAUSE, 5);
-        set_hitbox_value(AT_FSTRONG, 2, HG_HIT_SFX, sound_get("snd_hurt1"));
+            if (fstrong_fatigue == 1) {
+                b_dmg = 4;
+                b_size = 28;
+                b_spr = sprite_get("lane_bullet");
+                b_mask = sprite_get("lane_bullet_mask");
+                b_spd = 4.0;
+                b_life = 13;
+                m_dmg = 2;
+                m_w = 30;
+                m_h = 40;
+            } else if (fstrong_fatigue == 2) {
+                b_dmg = 3;
+                b_size = 20;
+                b_spr = sprite_get("lane_bullet_small");
+                b_mask = sprite_get("lane_bullet_small_mask");
+                b_spd = 3.8;
+                b_life = 12;
+                m_dmg = 2;
+                m_w = 26;
+                m_h = 36;
+            } else if (fstrong_fatigue == 3) {
+                b_dmg = 2;
+                b_size = 16;
+                b_spr = sprite_get("lane_bullet_tiny");
+                b_mask = sprite_get("lane_bullet_tiny_mask");
+                b_spd = 3.5;
+                b_life = 11;
+                m_dmg = 1;
+                m_w = 22;
+                m_h = 30;
+            } else if (fstrong_fatigue >= 4) {
+                b_dmg = 1;
+                b_size = 14;
+                b_spr = sprite_get("lane_bullet_tiny");
+                b_mask = sprite_get("lane_bullet_tiny_mask");
+                b_spd = 3.2;
+                b_life = 10;
+                m_dmg = 1;
+                m_w = 20;
+                m_h = 28;
+            }
+
+            // Hitbox 1: Lane Bullet short-ranged projectile (20% knockback, smaller hitbox, shorter range)
+            set_hitbox_value(AT_FSTRONG, 1, HG_HITBOX_TYPE, 2);
+            set_hitbox_value(AT_FSTRONG, 1, HG_WINDOW, 2);
+            set_hitbox_value(AT_FSTRONG, 1, HG_LIFETIME, b_life);
+            set_hitbox_value(AT_FSTRONG, 1, HG_HITBOX_X, 36);
+            set_hitbox_value(AT_FSTRONG, 1, HG_HITBOX_Y, -40);
+            set_hitbox_value(AT_FSTRONG, 1, HG_WIDTH, b_size);
+            set_hitbox_value(AT_FSTRONG, 1, HG_HEIGHT, b_size);
+            set_hitbox_value(AT_FSTRONG, 1, HG_PRIORITY, 3);
+            set_hitbox_value(AT_FSTRONG, 1, HG_DAMAGE, b_dmg);
+            set_hitbox_value(AT_FSTRONG, 1, HG_ANGLE, 45);
+            set_hitbox_value(AT_FSTRONG, 1, HG_BASE_KNOCKBACK, 0.9); // 20% of 4.5
+            set_hitbox_value(AT_FSTRONG, 1, HG_KNOCKBACK_SCALING, 0.08); // 20% of 0.4
+            set_hitbox_value(AT_FSTRONG, 1, HG_BASE_HITPAUSE, 4);
+            set_hitbox_value(AT_FSTRONG, 1, HG_HITPAUSE_SCALING, 0.1);
+            set_hitbox_value(AT_FSTRONG, 1, HG_VISUAL_EFFECT, 301);
+            set_hitbox_value(AT_FSTRONG, 1, HG_HIT_SFX, sound_get("snd_damage"));
+            set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_SPRITE, b_spr);
+            set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_MASK, b_mask);
+            set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_ANIM_SPEED, 0.25);
+            set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_HSPEED, b_spd);
+            set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_VSPEED, 0);
+            set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_GRAVITY, 0);
+            set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_GROUND_BEHAVIOR, 1);
+            set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_GROUND_FRICTION, 0);
+            set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_WALL_BEHAVIOR, 0);
+            set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_IS_TRANSCENDENT, 1);
+
+            // Hitbox 2: Close wand swing melee hit (20% knockback, smaller hitbox)
+            set_hitbox_value(AT_FSTRONG, 2, HG_HITBOX_TYPE, 1);
+            set_hitbox_value(AT_FSTRONG, 2, HG_WINDOW, 2);
+            set_hitbox_value(AT_FSTRONG, 2, HG_LIFETIME, 3);
+            set_hitbox_value(AT_FSTRONG, 2, HG_HITBOX_X, 26);
+            set_hitbox_value(AT_FSTRONG, 2, HG_HITBOX_Y, -44);
+            set_hitbox_value(AT_FSTRONG, 2, HG_WIDTH, m_w);
+            set_hitbox_value(AT_FSTRONG, 2, HG_HEIGHT, m_h);
+            set_hitbox_value(AT_FSTRONG, 2, HG_PRIORITY, 2);
+            set_hitbox_value(AT_FSTRONG, 2, HG_DAMAGE, m_dmg);
+            set_hitbox_value(AT_FSTRONG, 2, HG_ANGLE, 45);
+            set_hitbox_value(AT_FSTRONG, 2, HG_BASE_KNOCKBACK, 0.8); // 20% of 4.0
+            set_hitbox_value(AT_FSTRONG, 2, HG_KNOCKBACK_SCALING, 0.04); // 20% of 0.2
+            set_hitbox_value(AT_FSTRONG, 2, HG_BASE_HITPAUSE, 4);
+            set_hitbox_value(AT_FSTRONG, 2, HG_HIT_SFX, sound_get("snd_hurt1"));
+        }
     }
 }
 

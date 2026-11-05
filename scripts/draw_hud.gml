@@ -88,3 +88,49 @@ else
     draw_sprite(sprite_get("ghost_cooldown"), 1, temp_x + 196, 494);
     shader_end();
 }
+
+
+// =========================================================================
+// Bomb Cooldown Indicators (outside battle, on top of player damage)
+// Pink (frame 0) = UP!
+// Blue (frame 1) = DOWN (lockout)!
+// Positioned directly above her player damage at temp_x + 72 and temp_x + 104, temp_y - 30.
+// Hides when neither move is locked out or recently recovered to be non-invasive.
+// =========================================================================
+var hud_bomb_y = temp_y - 30;
+
+// Left Bomb: Kitty Bomb (NSpecial)
+var k_draw = false;
+var k_frame = 0;
+var k_alpha = 1;
+if (nspecial_lockout > 0) {
+    k_draw = true;
+    k_frame = 1; // Blue (sleeping)
+} else if (nspecial_up_timer > 0) {
+    k_draw = true;
+    k_frame = 0; // Pink (awake)
+    k_alpha = clamp(nspecial_up_timer / 30, 0, 1);
+}
+
+if (k_draw) {
+    var k_nudge = (nspecial_hud_nudge > 0) ? ((nspecial_hud_nudge % 2 == 0) ? -2 : 2) : 0;
+    draw_sprite_ext(sprite_get("hud_kitty_bomb"), k_frame, temp_x + 72 + k_nudge, hud_bomb_y, 1, 1, 0, c_white, k_alpha);
+}
+
+// Right Bomb: Smash Bomb (Ground FStrong)
+var s_draw = false;
+var s_frame = 0;
+var s_alpha = 1;
+if (fstrong_lockout > 0) {
+    s_draw = true;
+    s_frame = 1; // Blue (sleeping)
+} else if (fstrong_up_timer > 0) {
+    s_draw = true;
+    s_frame = 0; // Pink (awake)
+    s_alpha = clamp(fstrong_up_timer / 30, 0, 1);
+}
+
+if (s_draw) {
+    var s_nudge = (fstrong_hud_nudge > 0) ? ((fstrong_hud_nudge % 2 == 0) ? -2 : 2) : 0;
+    draw_sprite_ext(sprite_get("hud_smash_bomb"), s_frame, temp_x + 104 + s_nudge, hud_bomb_y, 1, 1, 0, c_white, s_alpha);
+}

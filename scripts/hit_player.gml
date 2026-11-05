@@ -41,13 +41,49 @@ if (instance_exists(hit_player_obj) && !hit_player_obj.clone && hit_player_obj.p
         meter_gain += 8;
     }
 
-    doki_meter = min(100, doki_meter + meter_gain);
-    if (doki_meter >= 100) {
-        bb_unlocked = true;
+    // Every time she uses her ult in an individual life, it is harder to gain doki:
+    var life_scale = 1.0;
+    if (bb_uses_this_life == 1) life_scale = 0.7;
+    else if (bb_uses_this_life == 2) life_scale = 0.5;
+    else if (bb_uses_this_life >= 3) life_scale = 0.35;
+    meter_gain = meter_gain * life_scale;
+
+    if (!bb_unlocked) {
+        // 3% Doki Crit Mechanic: Spend 3% Doki to have a 3% chance to crit on attacks!
+        // Only active while Ultimate is NOT yet unlocked. Once Ultimate is up, this ability goes away.
+        if (doki_meter >= 3 && !bb_active) {
+            var crit_roll = random_func((get_gameplay_time() + hit_player_obj.player * 11) % 25, 100, true);
+            if (crit_roll < 3) {
+                // Spends 3% Doki meter!
+                doki_meter = max(0, doki_meter - 3);
+
+                // Deals +5 bonus crit damage and extra hitpause
+                take_damage(hit_player_obj.player, player, 5);
+                hit_player_obj.hitstop = max(hit_player_obj.hitstop, 12);
+                hitstop = max(hitstop, 10);
+                sound_play(sound_get("heart_electric"));
+                sound_play(sound_get("snd_pink_coin"));
+
+                heal_popup_timer = 40;
+                heal_popup_amount = 0;
+                heal_popup_is_crit = true;
+                heal_popup_x = hit_player_obj.x;
+                heal_popup_y = hit_player_obj.y - hit_player_obj.char_height - 15;
+            }
+        }
+
+        doki_meter = min(100, doki_meter + meter_gain);
+        if (doki_meter >= 100) {
+            doki_meter = 100;
+            bb_unlocked = true;
+            bb_cooldown = 0;
+            doki_tier = 3;
+            sound_play(sound_get("heart_electric"));
+        }
     }
 
-    // Record Dummy hit (AT_DSPECIAL) or Kitty hit (AT_NSPECIAL / AT_DAIR) when Battle Box is off cooldown
-    if (!bb_active && bb_unlocked && bb_cooldown <= 0) {
+    // Record Dummy hit (AT_DSPECIAL) or Kitty hit (AT_NSPECIAL / AT_DAIR) when Battle Box is unlocked
+    if (!bb_active && bb_unlocked) {
         if (my_hitboxID.attack == AT_DSPECIAL) {
             bb_dummy_hit_timer[vp] = bb_quick_window;
             sound_play(sound_get("sfx_mark"));
@@ -59,16 +95,20 @@ if (instance_exists(hit_player_obj) && !hit_player_obj.clone && hit_player_obj.p
     }
 
     // Trigger Deltarune Battle Box when the same opponent is hit by both Dummy and Kitty in quick succession!
-    if (!bb_active && bb_unlocked && bb_cooldown <= 0 && bb_dummy_hit_timer[vp] > 0 && bb_kitty_hit_timer[vp] > 0) {
+    if (!bb_active && bb_unlocked && bb_dummy_hit_timer[vp] > 0 && bb_kitty_hit_timer[vp] > 0) {
         bb_dummy_hit_timer[vp] = 0;
         bb_kitty_hit_timer[vp] = 0;
 
         // Consumes Doki Meter!
         doki_meter = 0;
         bb_unlocked = false;
+        doki_tier = 1;
+        bb_used_once = true;
+        bb_uses_this_life++;
 
         bb_active = true;
         bb_timer = 0;
+        bb_hits_taken = 0;
         bb_mode = bb_next_mode;
         bb_next_mode = (bb_next_mode == 1) ? 2 : 1;
         bb_max_time = (bb_mode == 1) ? 340 : 350; // 1.5 seconds (90 frames) longer than before
@@ -106,9 +146,10 @@ if (instance_exists(hit_player_obj) && !hit_player_obj.clone && hit_player_obj.p
         bb_objects = [];
         bb_spawned_count = 0;
 
-        // Protect both players, play snd_pink_coin + laugh, and have Pink taunt while the box loads!
+        // Protect Pink during cutscene, play snd_pink_coin + laugh, and have Pink taunt while the box loads!
         invincible_timer = 360;
-        hit_player_obj.invincible_timer = 360;
+        hit_player_obj.invincible = false;
+        hit_player_obj.invincible_timer = 0;
         hsp = 0;
         vsp = 0;
         set_attack(AT_TAUNT);

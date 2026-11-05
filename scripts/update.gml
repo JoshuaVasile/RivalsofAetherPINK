@@ -19,6 +19,14 @@ if (ghost_cooldown > 0)
 if (bb_cooldown > 0)
 {
     bb_cooldown--;
+    if (bb_cooldown == 0 && bb_used_once && !bb_unlocked) {
+        // 37 seconds elapsed after last use: Reloads Ultimate!
+        bb_unlocked = true;
+        doki_meter = 100;
+        doki_tier = 3;
+        sound_play(sound_get("heart_electric"));
+        sound_play(sound_get("snd_pink_coin"));
+    }
 }
 
 if (heal_popup_timer > 0)
@@ -33,49 +41,123 @@ if (state != PS_PARRY) {
 }
 
 // Doki Meter & Ultimate state tracking:
-// Taking damage drains Doki Meter (-0.5% per damage taken)
+// Pink takes slightly more damage (+15%) until her Doki bar is filled to 100% MAX.
+// Taking damage drains Doki Meter based on current Tier level (unless locked in)
+// Level 1: 0.4% per dmg | Level 2: 0.5% per dmg | Level 3 (last level): 0.6% per dmg
 var cur_dmg = get_player_damage(player);
 if (cur_dmg > prev_player_damage) {
     var diff = cur_dmg - prev_player_damage;
-    doki_meter = max(0, doki_meter - diff * 0.5);
+    if (!bb_unlocked) {
+        // Takes slightly more damage until her Doki bar is filled (extra +15% damage taken)
+        var extra_dmg = max(1, round(diff * 0.15));
+        take_damage(player, -1, extra_dmg);
+        cur_dmg = get_player_damage(player);
+        diff = cur_dmg - prev_player_damage;
+
+        var drain_rate = 0.5;
+        if (doki_tier == 1) drain_rate = 0.4;
+        else if (doki_tier == 2) drain_rate = 0.5;
+        else if (doki_tier == 3) drain_rate = 0.6;
+        doki_meter = max(0, doki_meter - diff * drain_rate);
+    }
 }
 prev_player_damage = cur_dmg;
 
-// Doki Meter Tiers:
-// Tier 1: 0..33% (Green)
-// Tier 2: 34..66% (Purple - Heart aura, +5% Crit chance, +2 damage on hits)
-// Tier 3: 67..100% (Pink - at 100% MAX, Battle Box is earned & unlocked!)
-var old_tier = doki_tier;
-if (doki_meter >= 67) {
+// Once locked in, doki_meter stays at 100 MAX and cannot be lost until used
+if (bb_unlocked) {
+    doki_meter = 100;
     doki_tier = 3;
-} else if (doki_meter >= 34) {
-    doki_tier = 2;
 } else {
-    doki_tier = 1;
-}
+    // Doki Meter Tiers:
+    // Tier 1: 0..33% (Green)
+    // Tier 2: 34..66% (Purple - Heart aura, +5% Crit chance, +2 damage on hits)
+    // Tier 3: 67..100% (Pink - at 100% MAX, Battle Box is earned & locked in!)
+    var old_tier = doki_tier;
+    if (doki_meter >= 67) {
+        doki_tier = 3;
+    } else if (doki_meter >= 34) {
+        doki_tier = 2;
+    } else {
+        doki_tier = 1;
+    }
 
-if (doki_tier != old_tier) {
-    doki_tier_flash = 20;
-    if (doki_tier == 3 && doki_meter >= 100) {
+    if (doki_tier != old_tier) {
+        doki_tier_flash = 20;
+        if (doki_tier == 3 && doki_meter >= 100) {
+            sound_play(sound_get("heart_electric"));
+        } else if (doki_tier == 2) {
+            sound_play(sound_get("sfx_mark"));
+        }
+    }
+    if (doki_tier_flash > 0) doki_tier_flash--;
+
+    if (doki_meter >= 100) {
+        doki_meter = 100;
+        bb_unlocked = true;
+        bb_cooldown = 0;
+        doki_tier = 3;
         sound_play(sound_get("heart_electric"));
-    } else if (doki_tier == 2) {
-        sound_play(sound_get("sfx_mark"));
     }
 }
-if (doki_tier_flash > 0) doki_tier_flash--;
 
-if (doki_meter >= 100) {
-    bb_unlocked = true;
+// Ground Left & Right Smash anti-spam 5.5-second lockout & fatigue decay
+if (fstrong_lockout > 0) {
+    fstrong_lockout--;
+    if (fstrong_lockout == 0) {
+        fstrong_up_timer = 180; // 3 seconds Pink (awake) notification to show it's back UP!
+    }
+    if (!free) {
+        move_cooldown[AT_FSTRONG] = 2; // Locked out from casting Ground FStrong
+    } else {
+        move_cooldown[AT_FSTRONG] = 0; // Aerial Bomb drop is still allowed
+    }
 } else {
-    bb_unlocked = false;
+    if (fstrong_up_timer > 0) fstrong_up_timer--;
+    if (fstrong_fatigue_timer > 0) {
+        fstrong_fatigue_timer--;
+        if (fstrong_fatigue_timer == 0) {
+            fstrong_fatigue = 0; // Fully recovered back to full size
+        }
+    }
 }
+if (fstrong_hud_nudge > 0) fstrong_hud_nudge--;
 
-// Reset on respawn / death / spawn: Earn ult via Doki Meter
+// X Kitty (NSpecial) anti-spam 5.5-second lockout & fatigue decay
+if (nspecial_lockout > 0) {
+    nspecial_lockout--;
+    if (nspecial_lockout == 0) {
+        nspecial_up_timer = 180; // 3 seconds Pink (awake) notification to show it's back UP!
+    }
+    move_cooldown[AT_NSPECIAL] = 2; // Locked out from casting X Kitty
+} else {
+    if (nspecial_up_timer > 0) nspecial_up_timer--;
+    if (nspecial_fatigue_timer > 0) {
+        nspecial_fatigue_timer--;
+        if (nspecial_fatigue_timer == 0) {
+            nspecial_fatigue = 0; // Fully recovered back to full size
+        }
+    }
+}
+if (nspecial_hud_nudge > 0) nspecial_hud_nudge--;
+
+// Reset on respawn / death / spawn: Doki meter goes to zero, gives chance to earn it again like the first time
 if (state == PS_RESPAWN || state == PS_SPAWN || state == PS_DEAD) {
-    bb_unlocked = false;
-    bb_cooldown = 0;
     doki_meter = 0;
     doki_tier = 1;
+    bb_unlocked = false;
+    bb_cooldown = 0;
+    bb_uses_this_life = 0;
+    bb_hits_taken = 0;
+    fstrong_fatigue = 0;
+    fstrong_fatigue_timer = 0;
+    fstrong_lockout = 0;
+    fstrong_up_timer = 0;
+    fstrong_hud_nudge = 0;
+    nspecial_fatigue = 0;
+    nspecial_fatigue_timer = 0;
+    nspecial_lockout = 0;
+    nspecial_up_timer = 0;
+    nspecial_hud_nudge = 0;
     prev_player_damage = 0;
     bb_dummy_hit_timer = [0, 0, 0, 0, 0];
     bb_kitty_hit_timer = [0, 0, 0, 0, 0];
@@ -125,7 +207,8 @@ if (bb_active) {
         bb_victim.state_timer = 0;
         bb_victim.hitpause = true;
         bb_victim.hitstop = 2;
-        bb_victim.invincible_timer = 10;
+        bb_victim.invincible = false;
+        bb_victim.invincible_timer = 0;
         bb_victim.hurtboxID.sprite_index = asset_get("empty_sprite");
 
         // Opponent directional inputs (with CPU dodging fallback if opponent is a CPU)
@@ -239,7 +322,11 @@ if (bb_active) {
                     if (abs(obj.x) > 148) {
                         obj.active = false;
                     } else if (bb_soul_invuln <= 0 && obj.lane == bb_soul_lane && abs(obj.x - bb_soul_x) < 22) {
-                        take_damage(bb_victim.player, player, 7);
+                        var cur_hit_dmg = round(5 + (bb_hits_taken * 1.0));
+                        bb_victim.invincible = false;
+                        bb_victim.invincible_timer = 0;
+                        take_damage(bb_victim.player, player, cur_hit_dmg);
+                        bb_hits_taken++;
                         bb_soul_invuln = 28;
                         obj.active = false;
                         sound_play(sound_get("snd_hurt1"));
@@ -300,7 +387,11 @@ if (bb_active) {
                     }
                     if (obj.timer >= 31 && obj.timer <= 46 && !obj.hit_done && bb_soul_invuln <= 0) {
                         if (bb_soul_gx == obj.gx || bb_soul_gy == obj.gy) {
-                            take_damage(bb_victim.player, player, 11);
+                            var cur_hit_dmg = round(8 + (bb_hits_taken * 1.0));
+                            bb_victim.invincible = false;
+                            bb_victim.invincible_timer = 0;
+                            take_damage(bb_victim.player, player, cur_hit_dmg);
+                            bb_hits_taken++;
                             obj.hit_done = true;
                             bb_soul_invuln = 30;
                             sound_play(sound_get("snd_hurt1"));
@@ -316,8 +407,9 @@ if (bb_active) {
     } else {
         // Cleanly exit Battle Box and return both fighters to normal play
         bb_active = false;
-        bb_cooldown = bb_cooldown_max;
+        bb_cooldown = bb_cooldown_max; // Starts 37-second reload countdown!
         bb_objects = [];
+        bb_hits_taken = 0;
         hurtboxID.sprite_index = hurtbox_spr;
         if (instance_exists(bb_victim)) {
             bb_victim.hurtboxID.sprite_index = bb_victim.hurtbox_spr;

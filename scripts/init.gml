@@ -22,6 +22,20 @@ kiss_on_forward_tilt = false; // Set to true if holding Left/Right + Attack shou
 
 air_charge_timer = 0;
 
+// Ground Left & Right Smash (FStrong) anti-spam fatigue & 7-second lockout
+fstrong_fatigue = 0;       // 0 = full size, 1 = small, 2 = tiny
+fstrong_fatigue_timer = 0; // cooldown timer to recover back to full size
+fstrong_lockout = 0;       // 5.5-second lockout timer (330 frames)
+fstrong_up_timer = 0;      // HUD indicator timer for when it recovers back UP (Pink awake)
+fstrong_hud_nudge = 0;     // subtle visual nudge on HUD when pressed while locked out
+
+// X Kitty (NSpecial) anti-spam fatigue & 7-second lockout
+nspecial_fatigue = 0;       // 0 = full size, 1 = small, 2 = tiny
+nspecial_fatigue_timer = 0; // cooldown timer to recover back to full size
+nspecial_lockout = 0;       // 5.5-second lockout timer (330 frames)
+nspecial_up_timer = 0;      // HUD indicator timer for when it recovers back UP (Pink awake)
+nspecial_hud_nudge = 0;     // subtle visual nudge on HUD when pressed while locked out
+
 fan_cooldown = 0;
 fan_cooldown_max = 120;
 
@@ -39,7 +53,9 @@ bb_box_y = 0;
 bb_victim = noone;
 bb_unlocked = false;   // Locked until Doki Meter reaches 100% (Tier 3 MAX)
 bb_cooldown = 0;
-bb_cooldown_max = 2400; // 40 seconds (2400 frames) cooldown after use
+bb_cooldown_max = 2220; // 37 seconds (2220 frames) reload timer after last used
+bb_used_once = false;   // First time ult completes, player earns it
+bb_uses_this_life = 0;  // Times ult was used in current life (makes earning doki harder with each use)
 bb_quick_window = 240; // 4 seconds to land both Dummy and Kitty on the same opponent
 bb_dummy_hit_timer = [0, 0, 0, 0, 0];
 bb_kitty_hit_timer = [0, 0, 0, 0, 0];
@@ -66,6 +82,7 @@ bb_soul_move_cd = 0;
 bb_soul_invuln = 0;
 bb_objects = [];
 bb_spawned_count = 0;
+bb_hits_taken = 0;     // Number of times soul heart was hit inside current Battle Box (+1.5% dmg per hit)
  
 // STAT NAME		ZETTER VALUE   BASECAST RANGE   NOTES
 
@@ -208,7 +225,7 @@ hitstun_hurtbox_spr = -1; // -1 = use hurtbox_spr
 
 // Victory
 set_victory_bg(sprite_get("victory_background")); // victory_background.png
-set_victory_portrait(sprite_get("portrait")); // sprites/portrait.png (crisp win-screen art)
+set_victory_portrait(sprite_get("empty")); // sprites/empty.png (hides static engine portrait so results_draw_portrait renders once)
 set_victory_theme(sound_get("pink_victory")); // sounds/pink_victory.ogg (victory_theme.ogg does not exist)
 
 // Movement SFX

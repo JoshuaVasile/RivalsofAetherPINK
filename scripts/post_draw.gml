@@ -119,7 +119,13 @@ if (bb_active) {
 if (heal_popup_timer > 0) {
     var p_alpha = min(1, heal_popup_timer / 15);
     var mark_spr = sprite_get("bb_mark");
-    var p_str = (heal_popup_is_crit ? "+" + string(heal_popup_amount) + " CRIT!" : "+" + string(heal_popup_amount));
+    var p_str = "";
+    if (heal_popup_is_crit) {
+        if (heal_popup_amount > 0) p_str = "+" + string(heal_popup_amount) + " CRIT!";
+        else p_str = "CRIT!";
+    } else {
+        p_str = "+" + string(heal_popup_amount);
+    }
     var p_col = heal_popup_is_crit ? make_color_rgb(255, 230, 80) : make_color_rgb(100, 255, 120);
 
     // Draw little floating heart

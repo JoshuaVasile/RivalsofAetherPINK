@@ -1,3 +1,16 @@
+// Ground Left & Right Smash spam tracking and 7-second lockout
+if (attack == AT_FSTRONG && !free) {
+    if (window == 2 && window_timer == 1) {
+        fstrong_up_timer = 0;
+        fstrong_fatigue++;
+        fstrong_fatigue_timer = 210; // 3.5 seconds to recover from fatigue
+        if (fstrong_fatigue >= 5) {
+            fstrong_lockout = 330; // 5.5 seconds lockout!
+            fstrong_fatigue = 0;
+        }
+    }
+}
+
 // attack_update is a script called when you're doing an attack. It runs for every in-game frame.
 //B - Reversals
 if (attack == AT_NSPECIAL || attack == AT_FSPECIAL || attack == AT_DSPECIAL || attack == AT_USPECIAL){
@@ -120,6 +133,15 @@ if (attack == AT_FSPECIAL && window == 2 && !ghost_spawned)
 if (attack == AT_NSPECIAL) {
     // Allows throwing 2-3 kitties while they bounce across the stage
     move_cooldown[AT_NSPECIAL] = 16;
+    if (window == 2 && window_timer == 1) {
+        nspecial_up_timer = 0;
+        nspecial_fatigue++;
+        nspecial_fatigue_timer = 210; // 3.5 seconds to recover from fatigue
+        if (nspecial_fatigue >= 5) {
+            nspecial_lockout = 330; // 5.5 seconds lockout!
+            nspecial_fatigue = 0;
+        }
+    }
 }
 
 // Aerial Bomb Smashes: Air Down Smash (AT_DSTRONG when free) & Air Left/Right Smash (AT_FSTRONG when free)

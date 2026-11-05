@@ -495,6 +495,14 @@ with phone{
 	 * put the version number and full date.
 	 */
 	
+	initPatch("3.8", "11/4/26");
+	initPatchWords("Update 3.8
+	- Defense & Doki Meter: Pink now takes slightly more damage (+15%) while charging her Doki Meter. Once the meter is filled to 100% (MAX), her defenses solidify and damage taken returns to normal.
+	- Anti-Spam Adjustments: Ground Left/Right Smash and Kitty Toss now allow 5 consecutive casts before entering lockout.
+	- Faster Recovery: Cooldown lockout duration reduced from 7.0s down to 5.5s.
+	- Base Damage: Both Ground Smash bullet and Kitty Toss start at 5 base damage and decrease by 1 per consecutive cast.
+	- HUD Indicators: Blue sleeping bombs indicate active cooldown above her damage display, turning Pink upon recovery.");
+
 	initPatch("2.4", "11/2/26");
 	initPatchWords("Neutral A Kiss, Crit & Heal Update
 	- Neutral A base damage reduced by half to 4 on standard hits.

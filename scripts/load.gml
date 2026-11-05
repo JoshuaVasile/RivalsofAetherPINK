@@ -107,6 +107,16 @@ sprite_change_offset("parry_success", 96, 190);
 sprite_change_offset("parry_success_hurt", 96, 190);
 sprite_change_offset("lane_bullet", 32, 32);
 sprite_change_offset("lane_bullet_mask", 32, 32);
+sprite_change_offset("lane_bullet_small", 32, 32);
+sprite_change_offset("lane_bullet_small_mask", 32, 32);
+sprite_change_offset("lane_bullet_tiny", 32, 32);
+sprite_change_offset("lane_bullet_tiny_mask", 32, 32);
+sprite_change_offset("cat_small", 96, 190);
+sprite_change_offset("cat_tiny", 96, 190);
+sprite_change_offset("hud_kitty_bomb", 22, 22);
+sprite_change_offset("hud_smash_bomb", 22, 22);
+sprite_change_offset("victory_portrait", 0, 0);
+sprite_change_offset("empty", 0, 0);
 
 // Deltarune Battle Box sprites
 sprite_change_offset("bb_mark", 25, 22);
