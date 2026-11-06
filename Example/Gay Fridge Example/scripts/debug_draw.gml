@@ -1,1 +1,0 @@
-//draw_debug_text(x, y+12, "In Field: " + string(isCool));
