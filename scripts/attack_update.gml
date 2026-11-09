@@ -167,12 +167,31 @@ if ((attack == AT_DSTRONG || attack == AT_FSTRONG) && free) {
     var w_len = get_window_value(attack, 1, AG_WINDOW_LENGTH);
     if (window == 1 && window_timer == w_len - 1) {
         var holding_charge = (strong_down || down_strong_down || left_strong_down || right_strong_down || attack_down || down_stick_down || left_stick_down || right_stick_down);
-        if (holding_charge && air_charge_timer < 50) {
+        if (holding_charge && air_charge_timer < 60) {
             air_charge_timer++;
             strong_charge = min(60, air_charge_timer);
             window_timer = w_len - 2;
         }
     }
+
+    // Dynamic charge scaling for aerial executes around 170-180%
+    if (window <= 2) {
+        var charge_ratio = clamp(strong_charge / 60, 0, 1);
+        if (attack == AT_FSTRONG) {
+            var scaled_dmg = round(lerp(5, 8, charge_ratio));
+            var scaled_kbs = lerp(0.58, 0.72, charge_ratio);
+            set_hitbox_value(AT_FSTRONG, 1, HG_DAMAGE, scaled_dmg);
+            set_hitbox_value(AT_FSTRONG, 1, HG_KNOCKBACK_SCALING, scaled_kbs);
+            set_hitbox_value(AT_FSTRONG, 2, HG_DAMAGE, scaled_dmg);
+            set_hitbox_value(AT_FSTRONG, 2, HG_KNOCKBACK_SCALING, scaled_kbs);
+        } else if (attack == AT_DSTRONG) {
+            var scaled_dmg = round(lerp(7, 10, charge_ratio));
+            var scaled_kbs = lerp(0.85, 1.15, charge_ratio);
+            set_hitbox_value(AT_DSTRONG, 1, HG_DAMAGE, scaled_dmg);
+            set_hitbox_value(AT_DSTRONG, 1, HG_KNOCKBACK_SCALING, scaled_kbs);
+        }
+    }
+
     if (window <= 3) {
         char_height = 120;
     } else {
@@ -185,6 +204,23 @@ if ((attack == AT_DSTRONG || attack == AT_FSTRONG) && free) {
         super_armor = false;
         soft_armor = 0;
         set_state(PS_PRATFALL);
+    }
+}
+
+// Ground Up Smash dynamic charge scaling (KOs vertically at ~170-180% when charged)
+if (attack == AT_USTRONG) {
+    if (window <= 2) {
+        var charge_ratio = clamp(strong_charge / 60, 0, 1);
+        set_hitbox_value(AT_USTRONG, 1, HG_DAMAGE, round(lerp(6, 8, charge_ratio)));
+        set_hitbox_value(AT_USTRONG, 1, HG_KNOCKBACK_SCALING, lerp(0.65, 0.80, charge_ratio));
+    }
+}
+
+// Ground Down Smash (slight knockback scaling reduction on final hit)
+if (attack == AT_DSTRONG && !free) {
+    if (window <= 1) {
+        var charge_ratio = clamp(strong_charge / 60, 0, 1);
+        set_hitbox_value(AT_DSTRONG, 4, HG_KNOCKBACK_SCALING, lerp(0.68, 0.74, charge_ratio));
     }
 }
 

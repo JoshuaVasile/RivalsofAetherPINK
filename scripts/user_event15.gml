@@ -495,6 +495,14 @@ with phone{
 	 * put the version number and full date.
 	 */
 	
+	initPatch("3.9", "11/9/26");
+	initPatchWords("Update 3.9
+	- Victory Screen: Grounded Pink's victory portrait flush with the bottom of the screen directly behind the 'PINK WINS!' banner.
+	- Solid Executes: Ground Up Smash, Air Left Smash, Air Right Smash, and Air Down Smash now reliably KO opponents at around 170-180% when charged.
+	- Hitbox Improvements: Air Down Smash reaches slightly further down with ~5% more vertical length; Ground Up Smash width expanded left and right by ~3%.
+	- Ground Down Smash: Slightly reduced knockback on the final hit to balance her execution tools.
+	- Bomb Indicators: Both bombs are now always visible on the HUD (Pink = Up/Ready, Blue = Down/Lockout) and sized down by 25% to be sleek and non-intrusive.");
+
 	initPatch("3.8", "11/4/26");
 	initPatchWords("Update 3.8
 	- Defense & Doki Meter: Pink now takes slightly more damage (+15%) while charging her Doki Meter. Once the meter is filled to 100% (MAX), her defenses solidify and damage taken returns to normal.

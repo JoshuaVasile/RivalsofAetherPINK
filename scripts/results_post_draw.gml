@@ -1,5 +1,5 @@
 // results_post_draw.gml
-// Fallback results screen drawer: ensures Pink is drawn once in the middle if results_draw_portrait was not called
+// Fallback results screen drawer: ensures Pink is drawn once in the standard portrait position if results_draw_portrait was not called
 
 var timer_val = ("results_timer" in self) ? results_timer : 0;
 
@@ -25,8 +25,13 @@ var draw_scale = (scr_w < 600) ? 0.5 : 1.0;
 var draw_w = 350 * draw_scale;
 var draw_h = 350 * draw_scale;
 
-var draw_x = round((scr_w - draw_w) / 2);
-var draw_y = round((scr_h - draw_h) / 2);
+// Standard results screen portrait position
+// Kept x exactly where it is (centered above PINK WINS) and pushed y down flush with the bottom of the screen behind the banner
+var draw_x = round(80 * draw_scale);
+if ("portrait_x" in self) {
+    draw_x = round((portrait_x + 225) * draw_scale);
+}
+var draw_y = round(scr_h - draw_h);
 
 var anim_frame = (timer_val div 10) % 2;
 
