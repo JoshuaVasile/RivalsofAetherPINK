@@ -1,2 +1,0 @@
-nspecial = false;
-starfruitId = noone;
