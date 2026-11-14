@@ -105,13 +105,15 @@ if (instance_exists(hit_player_obj) && !hit_player_obj.clone && hit_player_obj.p
         doki_tier = 1;
         bb_used_once = true;
         bb_uses_this_life++;
+        bb_total_uses++;
 
         bb_active = true;
         bb_timer = 0;
         bb_hits_taken = 0;
-        bb_mode = bb_next_mode;
-        bb_next_mode = (bb_next_mode == 1) ? 2 : 1;
-        bb_max_time = (bb_mode == 1) ? 340 : 350; // 1.5 seconds (90 frames) longer than before
+        // Strictly alternate: 1st Kitty's (1), 2nd Bombs (2), 3rd Kitty's (1), 4th Bombs (2), etc. throughout the entire battle
+        bb_mode = ((bb_total_uses % 2) == 1) ? 1 : 2;
+        bb_next_mode = (bb_mode == 1) ? 2 : 1;
+        bb_max_time = (bb_mode == 1) ? 340 : 350; // Kitty's = 340 frames, Bombs = 350 frames
         bb_victim = hit_player_obj;
 
         // Place the Battle Box in front of Pink and higher up above the stage floor

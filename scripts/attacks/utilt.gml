@@ -8,36 +8,55 @@ set_window_value(AT_UTILT, 1, AG_WINDOW_HAS_SFX, 1);
 set_window_value(AT_UTILT, 1, AG_WINDOW_SFX, sound_get("snd_smallswing"));
 set_window_value(AT_UTILT, 1, AG_WINDOW_SFX_FRAME, 2);
 
-set_window_value(AT_UTILT, 2, AG_WINDOW_LENGTH, 2);
+set_window_value(AT_UTILT, 2, AG_WINDOW_LENGTH, 3);
 set_window_value(AT_UTILT, 2, AG_WINDOW_ANIM_FRAMES, 1);
 set_window_value(AT_UTILT, 2, AG_WINDOW_ANIM_FRAME_START, 1);
 
-set_window_value(AT_UTILT, 3, AG_WINDOW_LENGTH, 4);
+set_window_value(AT_UTILT, 3, AG_WINDOW_LENGTH, 5);
 set_window_value(AT_UTILT, 3, AG_WINDOW_ANIM_FRAMES, 1);
 set_window_value(AT_UTILT, 3, AG_WINDOW_ANIM_FRAME_START, 2);
 set_window_value(AT_UTILT, 3, AG_WINDOW_HAS_WHIFFLAG, 1);
 
-set_num_hitboxes(AT_UTILT,1);
+set_num_hitboxes(AT_UTILT, 2);
 
-set_hitbox_value(AT_UTILT, 1, HG_MUNO_HITBOX_NAME, "Top Hit");
-
+// Hitbox 1: Front Scoop Hitbox (scoops grounded enemies in front of Pink up into the swing)
+set_hitbox_value(AT_UTILT, 1, HG_MUNO_HITBOX_NAME, "Front Scoop");
 set_hitbox_value(AT_UTILT, 1, HG_HITBOX_TYPE, 1);
 set_hitbox_value(AT_UTILT, 1, HG_WINDOW, 2);
 set_hitbox_value(AT_UTILT, 1, HG_LIFETIME, 3);
-set_hitbox_value(AT_UTILT, 1, HG_HITBOX_X, -6);
-set_hitbox_value(AT_UTILT, 1, HG_HITBOX_Y, -99);
-set_hitbox_value(AT_UTILT, 1, HG_WIDTH, 109);
-set_hitbox_value(AT_UTILT, 1, HG_HEIGHT, 72);
+set_hitbox_value(AT_UTILT, 1, HG_HITBOX_X, 30);
+set_hitbox_value(AT_UTILT, 1, HG_HITBOX_Y, -40);
+set_hitbox_value(AT_UTILT, 1, HG_WIDTH, 78);
+set_hitbox_value(AT_UTILT, 1, HG_HEIGHT, 78);
 set_hitbox_value(AT_UTILT, 1, HG_SHAPE, 0);
-set_hitbox_value(AT_UTILT, 1, HG_PRIORITY, 1);
-set_hitbox_value(AT_UTILT, 1, HG_DAMAGE, 2);
+set_hitbox_value(AT_UTILT, 1, HG_PRIORITY, 2);
+set_hitbox_value(AT_UTILT, 1, HG_DAMAGE, 5);
 set_hitbox_value(AT_UTILT, 1, HG_ANGLE, 85);
-set_hitbox_value(AT_UTILT, 1, HG_BASE_KNOCKBACK, 3);
-set_hitbox_value(AT_UTILT, 1, HG_KNOCKBACK_SCALING, .3);
-set_hitbox_value(AT_UTILT, 1, HG_BASE_HITPAUSE, 5);
+set_hitbox_value(AT_UTILT, 1, HG_BASE_KNOCKBACK, 5.5);
+set_hitbox_value(AT_UTILT, 1, HG_KNOCKBACK_SCALING, .4);
+set_hitbox_value(AT_UTILT, 1, HG_BASE_HITPAUSE, 6);
 set_hitbox_value(AT_UTILT, 1, HG_HITPAUSE_SCALING, .35);
-set_hitbox_value(AT_UTILT, 1, HG_VISUAL_EFFECT_X_OFFSET, 30);
-set_hitbox_value(AT_UTILT, 1, HG_VISUAL_EFFECT_Y_OFFSET, 10);
+set_hitbox_value(AT_UTILT, 1, HG_VISUAL_EFFECT_X_OFFSET, 28);
+set_hitbox_value(AT_UTILT, 1, HG_VISUAL_EFFECT_Y_OFFSET, -20);
 set_hitbox_value(AT_UTILT, 1, HG_HIT_SFX, sound_get("snd_hurt1"));
 
-set_hitbox_value(AT_UTILT, 2, HG_MUNO_HITBOX_MISC_ADD, "In the original release of Sandbert, this hitbox never appears because its height is set to 0.");
+// Hitbox 2: Top Overhead Hitbox
+set_hitbox_value(AT_UTILT, 2, HG_MUNO_HITBOX_NAME, "Top Arc");
+set_hitbox_value(AT_UTILT, 2, HG_HITBOX_TYPE, 1);
+set_hitbox_value(AT_UTILT, 2, HG_WINDOW, 2);
+set_hitbox_value(AT_UTILT, 2, HG_LIFETIME, 3);
+set_hitbox_value(AT_UTILT, 2, HG_HITBOX_X, -2);
+set_hitbox_value(AT_UTILT, 2, HG_HITBOX_Y, -90);
+set_hitbox_value(AT_UTILT, 2, HG_WIDTH, 114);
+set_hitbox_value(AT_UTILT, 2, HG_HEIGHT, 78);
+set_hitbox_value(AT_UTILT, 2, HG_SHAPE, 0);
+set_hitbox_value(AT_UTILT, 2, HG_PRIORITY, 1);
+set_hitbox_value(AT_UTILT, 2, HG_DAMAGE, 5);
+set_hitbox_value(AT_UTILT, 2, HG_ANGLE, 85);
+set_hitbox_value(AT_UTILT, 2, HG_BASE_KNOCKBACK, 5.5);
+set_hitbox_value(AT_UTILT, 2, HG_KNOCKBACK_SCALING, .4);
+set_hitbox_value(AT_UTILT, 2, HG_BASE_HITPAUSE, 6);
+set_hitbox_value(AT_UTILT, 2, HG_HITPAUSE_SCALING, .35);
+set_hitbox_value(AT_UTILT, 2, HG_VISUAL_EFFECT_X_OFFSET, 10);
+set_hitbox_value(AT_UTILT, 2, HG_VISUAL_EFFECT_Y_OFFSET, -60);
+set_hitbox_value(AT_UTILT, 2, HG_HIT_SFX, sound_get("snd_hurt1"));

@@ -26,7 +26,7 @@ set_hitbox_value(AT_JAB, 1, HG_HITBOX_Y, -39);
 set_hitbox_value(AT_JAB, 1, HG_WIDTH, 30);
 set_hitbox_value(AT_JAB, 1, HG_HEIGHT, 36);
 set_hitbox_value(AT_JAB, 1, HG_PRIORITY, 2);
-set_hitbox_value(AT_JAB, 1, HG_DAMAGE, 4); // Base damage dialed back to half (was 8)
+set_hitbox_value(AT_JAB, 1, HG_DAMAGE, 5); // +1% general damage buff (was 4)
 set_hitbox_value(AT_JAB, 1, HG_ANGLE, 60);
 set_hitbox_value(AT_JAB, 1, HG_BASE_KNOCKBACK, 4);
 set_hitbox_value(AT_JAB, 1, HG_KNOCKBACK_SCALING, 0);

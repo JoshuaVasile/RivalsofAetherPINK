@@ -69,9 +69,13 @@ sprite_change_offset("fstrong_hurt", 96, 190);
 sprite_change_offset("ustrong", 96, 190);
 sprite_change_offset("ustrong_hurt", 96, 190);
 sprite_change_offset("dstrong", 96, 190);
+sprite_change_offset("dstrong_air", 96, 190);
+sprite_change_offset("dstrong_bomb", 96, 160);
 sprite_change_offset("dstrong_hurt", 96, 190);
 sprite_change_offset("dstrong_cry", 96, 190);
 sprite_change_offset("dstrong_cry_hurt", 96, 190);
+sprite_change_offset("overcharge_hurt", 96, 190);
+sprite_change_offset("ustrong_cat", 96, 190);
 
 sprite_change_offset("nspecial", 96, 190);
 sprite_change_offset("nspecial_air", 96, 190);

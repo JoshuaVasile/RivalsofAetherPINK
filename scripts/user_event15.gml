@@ -495,6 +495,22 @@ with phone{
 	 * put the version number and full date.
 	 */
 	
+	initPatch("4.3", "11/13/26");
+	initPatchWords("Update 4.3\r\n	- Ultimate Cycle: Pink's Battle Box attack now strictly alternates throughout the entire battle (1st is Kitty's, 2nd is Bombs, 3rd is Kitty's, 4th is Bombs, etc., persisting across lives until the match ends).");
+
+	initPatch("4.2", "11/13/26");
+	initPatchWords("Update 4.2
+	- Overall Damage Buff: All moves now deal slightly more damage across the board.
+	- Up Tilt: Added a front scoop hitbox and increased damage.
+	- Ground Forward Smash: Extended charge window with much stronger damage and knockout power on charge, but charging for too long will shock and damage Pink!
+	- Ground Down Smash: Larger hitbox and much snappier startup/recovery.
+	- Ground Up Smash: Charging summons up to 3 cats side-by-side that launch upward at staggered heights (100%, 75%, 50%) for bigger damage, with overcharge self-damage if held too long.
+	- Neutral Air: Early hits pull opponents inward before the final hit launches them outward.
+	- Back Air: Heavily buffed damage and outward knockout power, expanded outward reach, and fixed aerial Back Smash eating Back Air inputs.
+	- Down Air: No longer puts Pink into freefall.
+	- Aerial Smashes: Pink now glides through the air with momentum and gravity while holding her bomb instead of stopping mid-air.
+	- Aerial Down Smash: Bomb visibly grows larger and hits harder the longer you charge it, but overcharging will blow up in Pink's face!");
+
 	initPatch("3.9", "11/9/26");
 	initPatchWords("Update 3.9
 	- Victory Screen: Grounded Pink's victory portrait flush with the bottom of the screen directly behind the 'PINK WINS!' banner.

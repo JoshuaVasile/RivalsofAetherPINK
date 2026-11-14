@@ -21,6 +21,12 @@ heal_popup_y = 0;
 kiss_on_forward_tilt = false; // Set to true if holding Left/Right + Attack should also do the Kiss instead of the parasol poke
 
 air_charge_timer = 0;
+pink_charge_timer = 0;
+overcharge_warning = false;
+overcharge_hurt_timer = 0;
+dstrong_bomb_stage = 0;
+dstrong_bomb_scale = 1.0;
+ustrong_cat_count = 1;
 
 // Ground Left & Right Smash (FStrong) anti-spam fatigue & 7-second lockout
 fstrong_fatigue = 0;       // 0 = full size, 1 = small, 2 = tiny
@@ -46,8 +52,9 @@ ghost_cooldown_max = 180;
 bb_active = false;
 bb_timer = 0;
 bb_max_time = 340;     // 1.5 seconds (90 frames) longer than before (was 250)
-bb_mode = 0;           // 1 = Cat Notes on Strings (7 dmg), 2 = Grid Bombs (11 dmg)
-bb_next_mode = 1;      // Alternates default mode if Pink doesn't manually pick
+bb_mode = 1;           // 1 = Kitty's (Cat Notes on Strings), 2 = Bombs (Grid Bombs)
+bb_next_mode = 1;      // Alternates: 1st Kitty's, 2nd Bombs, 3rd Kitty's, etc.
+bb_total_uses = 0;     // Total times ultimate used in battle (persists across deaths)
 bb_box_x = 0;
 bb_box_y = 0;
 bb_victim = noone;

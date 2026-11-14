@@ -159,6 +159,12 @@ if (state == PS_RESPAWN || state == PS_SPAWN || state == PS_DEAD) {
     nspecial_up_timer = 0;
     nspecial_hud_nudge = 0;
     prev_player_damage = 0;
+    pink_charge_timer = 0;
+    overcharge_warning = false;
+    overcharge_hurt_timer = 0;
+    dstrong_bomb_stage = 0;
+    dstrong_bomb_scale = 1.0;
+    ustrong_cat_count = 1;
     bb_dummy_hit_timer = [0, 0, 0, 0, 0];
     bb_kitty_hit_timer = [0, 0, 0, 0, 0];
 }
@@ -224,21 +230,9 @@ if (bb_active) {
             v_down = (cpu_r == 3);
         }
 
-        // First 40 frames: Battle Box spins open while Pink laughs; allow Pink to pick Option 1 or Option 2
+        // First 40 frames: Battle Box spins open while Pink laughs
         if (bb_timer <= 40) {
-            if (bb_timer >= 12) {
-                if (attack_pressed || special_pressed) {
-                    bb_mode = 1; // Option 1: Cat Musical Notes on 3 Strings
-                    bb_max_time = 340; // 1.5s longer (was 250)
-                } else if (up_strong_pressed || down_strong_pressed || left_strong_pressed || right_strong_pressed || strong_down || jump_pressed) {
-                    bb_mode = 2; // Option 2: Falling Bombs on 4x4 Grid
-                    bb_max_time = 350; // 1.5s longer (was 260)
-                }
-            }
             if (bb_timer == 40) {
-                if (bb_mode != 1 && bb_mode != 2) {
-                    bb_mode = 1;
-                }
                 if (bb_mode == 1) {
                     bb_soul_lane = 1;
                     bb_soul_x = 0;
@@ -322,7 +316,7 @@ if (bb_active) {
                     if (abs(obj.x) > 148) {
                         obj.active = false;
                     } else if (bb_soul_invuln <= 0 && obj.lane == bb_soul_lane && abs(obj.x - bb_soul_x) < 22) {
-                        var cur_hit_dmg = round(5 + (bb_hits_taken * 1.0));
+                        var cur_hit_dmg = round(6 + (bb_hits_taken * 1.0));
                         bb_victim.invincible = false;
                         bb_victim.invincible_timer = 0;
                         take_damage(bb_victim.player, player, cur_hit_dmg);
@@ -387,7 +381,7 @@ if (bb_active) {
                     }
                     if (obj.timer >= 31 && obj.timer <= 46 && !obj.hit_done && bb_soul_invuln <= 0) {
                         if (bb_soul_gx == obj.gx || bb_soul_gy == obj.gy) {
-                            var cur_hit_dmg = round(8 + (bb_hits_taken * 1.0));
+                            var cur_hit_dmg = round(9 + (bb_hits_taken * 1.0));
                             bb_victim.invincible = false;
                             bb_victim.invincible_timer = 0;
                             take_damage(bb_victim.player, player, cur_hit_dmg);
@@ -427,19 +421,18 @@ if (bb_active) {
 }
 
 // Aerial Strong inputs:
-// - Down + Strong does Aerial Down Smash (AT_DSTRONG when free: slowly falls, charges bomb, spikes downward, free fall after)
-// - Left / Right + Strong does Aerial Left/Right Smash (AT_FSTRONG when free: slowly falls, charges bomb, drops bomb left or right, free fall after)
+// - Down + Strong does Aerial Down Smash (AT_DSTRONG when free: glides with gravity, charges growing bomb, drops it downward)
+// - Forward + Strong does Aerial Left/Right Smash (AT_FSTRONG when free: glides with gravity, charges bomb, drops bomb forward)
 // - Up + Strong / Neutral Strong does Ghost Flight (AT_USPECIAL)
-if (!bb_active && free && (state == PS_FIRST_JUMP || state == PS_DOUBLE_JUMP || state == PS_IDLE_AIR || state == PS_WALL_JUMP)) {
-    if (down_strong_pressed || (down_down && (strong_pressed || strong_down))) {
+// Note: Only triggers on fresh strong presses and does not override Backward Strong so Back Air (AT_BAIR) comes out reliably!
+if (!bb_active && overcharge_hurt_timer <= 0 && free && (state == PS_FIRST_JUMP || state == PS_DOUBLE_JUMP || state == PS_IDLE_AIR || state == PS_WALL_JUMP)) {
+    if (down_strong_pressed || (down_down && strong_pressed)) {
         set_attack(AT_DSTRONG);
-    } else if (left_strong_pressed || (left_down && (strong_pressed || strong_down))) {
-        spr_dir = -1;
+    } else if ((left_strong_pressed || (left_down && strong_pressed)) && spr_dir == -1) {
         set_attack(AT_FSTRONG);
-    } else if (right_strong_pressed || (right_down && (strong_pressed || strong_down))) {
-        spr_dir = 1;
+    } else if ((right_strong_pressed || (right_down && strong_pressed)) && spr_dir == 1) {
         set_attack(AT_FSTRONG);
-    } else if (move_cooldown[AT_USPECIAL] == 0 && (up_strong_pressed || (up_down && (strong_pressed || strong_down)) || strong_pressed || strong_down)) {
+    } else if (move_cooldown[AT_USPECIAL] == 0 && (up_strong_pressed || (up_down && strong_pressed) || (strong_pressed && !left_down && !right_down && !down_down))) {
         set_attack(AT_USPECIAL);
     }
 }

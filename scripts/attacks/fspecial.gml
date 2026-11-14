@@ -38,7 +38,7 @@ set_hitbox_value(AT_FSPECIAL, 1, HG_HITBOX_Y, 0);
 set_hitbox_value(AT_FSPECIAL, 1, HG_WIDTH, 90);
 set_hitbox_value(AT_FSPECIAL, 1, HG_HEIGHT, 80);
 set_hitbox_value(AT_FSPECIAL, 1, HG_PRIORITY, 3);
-set_hitbox_value(AT_FSPECIAL, 1, HG_DAMAGE, 6);
+set_hitbox_value(AT_FSPECIAL, 1, HG_DAMAGE, 7);
 set_hitbox_value(AT_FSPECIAL, 1, HG_ANGLE, 45);
 set_hitbox_value(AT_FSPECIAL, 1, HG_VISUAL_EFFECT_Y_OFFSET, 0);
 set_hitbox_value(AT_FSPECIAL, 1, HG_BASE_KNOCKBACK, 4);
