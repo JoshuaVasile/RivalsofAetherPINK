@@ -11,7 +11,7 @@ set_window_value(AT_JAB, 2, AG_WINDOW_LENGTH, 6);
 set_window_value(AT_JAB, 2, AG_WINDOW_ANIM_FRAMES, 1);
 set_window_value(AT_JAB, 2, AG_WINDOW_ANIM_FRAME_START, 1);
 
-set_window_value(AT_JAB, 3, AG_WINDOW_LENGTH, 6);
+set_window_value(AT_JAB, 3, AG_WINDOW_LENGTH, 8);
 set_window_value(AT_JAB, 3, AG_WINDOW_ANIM_FRAMES, 1);
 set_window_value(AT_JAB, 3, AG_WINDOW_ANIM_FRAME_START, 2);
 set_window_value(AT_JAB, 3, AG_WINDOW_HAS_WHIFFLAG, 1); //NOTE: if you make it a multi-hit jab, remove whifflag, since Rivals multi-step jabs do not have whifflag. single-hits like sandbert, elli, etc DO have whifflag
@@ -27,11 +27,11 @@ set_hitbox_value(AT_JAB, 1, HG_WIDTH, 30);
 set_hitbox_value(AT_JAB, 1, HG_HEIGHT, 36);
 set_hitbox_value(AT_JAB, 1, HG_PRIORITY, 2);
 set_hitbox_value(AT_JAB, 1, HG_DAMAGE, 5); // +1% general damage buff (was 4)
-set_hitbox_value(AT_JAB, 1, HG_ANGLE, 60);
-set_hitbox_value(AT_JAB, 1, HG_BASE_KNOCKBACK, 4);
-set_hitbox_value(AT_JAB, 1, HG_KNOCKBACK_SCALING, 0);
+set_hitbox_value(AT_JAB, 1, HG_ANGLE, 45);
+set_hitbox_value(AT_JAB, 1, HG_BASE_KNOCKBACK, 5.0);
+set_hitbox_value(AT_JAB, 1, HG_KNOCKBACK_SCALING, 0.25);
 set_hitbox_value(AT_JAB, 1, HG_BASE_HITPAUSE, 6);
-set_hitbox_value(AT_JAB, 1, HG_HITPAUSE_SCALING, 0);
+set_hitbox_value(AT_JAB, 1, HG_HITPAUSE_SCALING, 0.15);
 set_hitbox_value(AT_JAB, 1, HG_VISUAL_EFFECT, 0);
 set_hitbox_value(AT_JAB, 1, HG_VISUAL_EFFECT_X_OFFSET, 32);
 set_hitbox_value(AT_JAB, 1, HG_VISUAL_EFFECT_Y_OFFSET, -10);

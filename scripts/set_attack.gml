@@ -2,6 +2,10 @@
 if (attack == AT_NSPECIAL) {
     if (nspecial_lockout > 0) {
         nspecial_hud_nudge = 8;
+        if (!nspecial_lockout_voiced) {
+            nspecial_lockout_voiced = true;
+            sound_play(sound_get("snd_lockout_huh"));
+        }
         attack = AT_NO_ATTACK;
     } else {
         // Base damage starts at 6 (+1% general buff) and steps down by 1 per consecutive cast (6 -> 5 -> 4 -> 3 -> 2)
@@ -62,6 +66,8 @@ if (free) {
     if (attack == AT_DAIR) {
         if (down_strong_pressed || strong_pressed) {
             attack = AT_DSTRONG; // Air Down Smash (Growing Charged Bomb dropping down)
+        } else if (dair_air_uses >= 3) {
+            attack = AT_NO_ATTACK;
         }
     }
     if (attack == AT_FAIR) {
@@ -73,6 +79,11 @@ if (free) {
         if (strong_pressed && !left_stick_pressed && !right_stick_pressed) {
             spr_dir *= -1;
             attack = AT_FSTRONG; // Air Back Smash (Charged Bomb dropping backward)
+        }
+    }
+    if (attack == AT_UAIR) {
+        if (up_strong_pressed || strong_pressed) {
+            attack = AT_USTRONG; // Air Up Smash (Upward Bouncing Kitty Toss)
         }
     }
 }
@@ -325,9 +336,13 @@ if (attack == AT_FSTRONG) {
         set_hitbox_value(AT_FSTRONG, 2, HG_HIT_SFX, sound_get("snd_hurt1"));
         set_hitbox_value(AT_FSTRONG, 2, HG_HIT_LOCKOUT, 10);
     } else {
-        // Grounded FStrong: Lane Bullet Projectile (15 dmg half charge, 30 dmg full charge, KOs ~130%, anti-spam fatigue & overcharge self-damage)
+        // Grounded FStrong: Single-hit Wand & Lane Bullet Burst (10 uncharged -> 17 full charge, ~50% travel of old 4.2 bullet, anti-spam fatigue & overcharge self-damage)
         if (fstrong_lockout > 0) {
             fstrong_hud_nudge = 8;
+            if (!fstrong_lockout_voiced) {
+                fstrong_lockout_voiced = true;
+                sound_play(sound_get("snd_lockout_huh"));
+            }
             attack = AT_NO_ATTACK;
         } else {
             set_attack_value(AT_FSTRONG, AG_CATEGORY, 0);
@@ -361,73 +376,64 @@ if (attack == AT_FSTRONG) {
             set_window_value(AT_FSTRONG, 3, AG_WINDOW_ANIM_FRAME_START, 4);
             set_window_value(AT_FSTRONG, 3, AG_WINDOW_HAS_WHIFFLAG, 1);
 
-            set_num_hitboxes(AT_FSTRONG, 2);
+            set_num_hitboxes(AT_FSTRONG, 1);
 
-            // Base uncharged stats (dynamically scaled up to 15 at half charge and 30 at full charge in attack_update.gml!)
-            var b_dmg = 9;
+            // Base uncharged stats (travels ~36px out to x+64, half of old 4.2 bullet's reach, scaled up to 17 dmg in attack_update.gml)
+            var b_dmg = 10;
             var b_size = 34;
             var b_spr = sprite_get("lane_bullet");
             var b_mask = sprite_get("lane_bullet_mask");
-            var b_spd = 4.6;
-            var b_life = 14;
-            var m_w = 42;
-            var m_h = 54;
+            var b_spd = 3.6;
+            var b_life = 10;
 
             if (fstrong_fatigue == 1) {
-                b_dmg = 7;
+                b_dmg = 8;
                 b_size = 32;
                 b_spr = sprite_get("lane_bullet");
                 b_mask = sprite_get("lane_bullet_mask");
-                b_spd = 4.4;
-                b_life = 14;
-                m_w = 38;
-                m_h = 48;
+                b_spd = 3.4;
+                b_life = 10;
             } else if (fstrong_fatigue == 2) {
-                b_dmg = 5;
+                b_dmg = 6;
                 b_size = 24;
                 b_spr = sprite_get("lane_bullet_small");
                 b_mask = sprite_get("lane_bullet_small_mask");
-                b_spd = 4.1;
-                b_life = 13;
-                m_w = 32;
-                m_h = 42;
+                b_spd = 3.2;
+                b_life = 9;
             } else if (fstrong_fatigue == 3) {
                 b_dmg = 4;
                 b_size = 18;
                 b_spr = sprite_get("lane_bullet_tiny");
                 b_mask = sprite_get("lane_bullet_tiny_mask");
-                b_spd = 3.8;
-                b_life = 12;
-                m_w = 26;
-                m_h = 36;
+                b_spd = 3.0;
+                b_life = 9;
             } else if (fstrong_fatigue >= 4) {
-                b_dmg = 2;
+                b_dmg = 3;
                 b_size = 16;
                 b_spr = sprite_get("lane_bullet_tiny");
                 b_mask = sprite_get("lane_bullet_tiny_mask");
-                b_spd = 3.5;
-                b_life = 11;
-                m_w = 24;
-                m_h = 32;
+                b_spd = 2.8;
+                b_life = 8;
             }
 
-            // Hitbox 1: Lane Bullet short-ranged projectile (KOs around 130%)
+            // Hitbox 1: Single Lane Bullet (~50% range of old 4.2 bullet, never double-hits)
             set_hitbox_value(AT_FSTRONG, 1, HG_HITBOX_TYPE, 2);
             set_hitbox_value(AT_FSTRONG, 1, HG_WINDOW, 2);
             set_hitbox_value(AT_FSTRONG, 1, HG_LIFETIME, b_life);
-            set_hitbox_value(AT_FSTRONG, 1, HG_HITBOX_X, 38);
-            set_hitbox_value(AT_FSTRONG, 1, HG_HITBOX_Y, -40);
+            set_hitbox_value(AT_FSTRONG, 1, HG_HITBOX_X, 28);
+            set_hitbox_value(AT_FSTRONG, 1, HG_HITBOX_Y, -42);
             set_hitbox_value(AT_FSTRONG, 1, HG_WIDTH, b_size);
             set_hitbox_value(AT_FSTRONG, 1, HG_HEIGHT, b_size);
             set_hitbox_value(AT_FSTRONG, 1, HG_PRIORITY, 3);
             set_hitbox_value(AT_FSTRONG, 1, HG_DAMAGE, b_dmg);
             set_hitbox_value(AT_FSTRONG, 1, HG_ANGLE, 42);
-            set_hitbox_value(AT_FSTRONG, 1, HG_BASE_KNOCKBACK, 7.6);
-            set_hitbox_value(AT_FSTRONG, 1, HG_KNOCKBACK_SCALING, 0.82);
+            set_hitbox_value(AT_FSTRONG, 1, HG_BASE_KNOCKBACK, 6.8);
+            set_hitbox_value(AT_FSTRONG, 1, HG_KNOCKBACK_SCALING, 0.78);
             set_hitbox_value(AT_FSTRONG, 1, HG_BASE_HITPAUSE, 8);
             set_hitbox_value(AT_FSTRONG, 1, HG_HITPAUSE_SCALING, 0.55);
             set_hitbox_value(AT_FSTRONG, 1, HG_VISUAL_EFFECT, 304);
             set_hitbox_value(AT_FSTRONG, 1, HG_HIT_SFX, sound_get("snd_damage"));
+            set_hitbox_value(AT_FSTRONG, 1, HG_HIT_LOCKOUT, 15);
             set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_SPRITE, b_spr);
             set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_MASK, b_mask);
             set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_ANIM_SPEED, 0.25);
@@ -437,25 +443,155 @@ if (attack == AT_FSTRONG) {
             set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_GROUND_BEHAVIOR, 1);
             set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_GROUND_FRICTION, 0);
             set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_WALL_BEHAVIOR, 0);
-            set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_IS_TRANSCENDENT, 1);
+            set_hitbox_value(AT_FSTRONG, 1, HG_PROJECTILE_IS_TRANSCENDENT, 0);
+        }
+    }
+}
 
-            // Hitbox 2: Close wand swing melee hit (matches KO knockback & charge damage)
-            set_hitbox_value(AT_FSTRONG, 2, HG_HITBOX_TYPE, 1);
-            set_hitbox_value(AT_FSTRONG, 2, HG_WINDOW, 2);
-            set_hitbox_value(AT_FSTRONG, 2, HG_LIFETIME, 4);
-            set_hitbox_value(AT_FSTRONG, 2, HG_HITBOX_X, 28);
-            set_hitbox_value(AT_FSTRONG, 2, HG_HITBOX_Y, -44);
-            set_hitbox_value(AT_FSTRONG, 2, HG_WIDTH, m_w);
-            set_hitbox_value(AT_FSTRONG, 2, HG_HEIGHT, m_h);
-            set_hitbox_value(AT_FSTRONG, 2, HG_PRIORITY, 2);
-            set_hitbox_value(AT_FSTRONG, 2, HG_DAMAGE, b_dmg);
-            set_hitbox_value(AT_FSTRONG, 2, HG_ANGLE, 42);
-            set_hitbox_value(AT_FSTRONG, 2, HG_BASE_KNOCKBACK, 7.6);
-            set_hitbox_value(AT_FSTRONG, 2, HG_KNOCKBACK_SCALING, 0.82);
-            set_hitbox_value(AT_FSTRONG, 2, HG_BASE_HITPAUSE, 8);
-            set_hitbox_value(AT_FSTRONG, 2, HG_HITPAUSE_SCALING, 0.55);
-            set_hitbox_value(AT_FSTRONG, 2, HG_VISUAL_EFFECT, 304);
-            set_hitbox_value(AT_FSTRONG, 2, HG_HIT_SFX, sound_get("snd_damage"));
+// Up Strong configuration: Grounded = 1..4 Charge-Loaded Shooting Cats; Aerial = Upward Bouncing Kitty Toss
+if (attack == AT_USTRONG) {
+    if (free) {
+        hsp *= 0.85;
+        if (vsp < 0) vsp *= 0.85;
+
+        set_attack_value(AT_USTRONG, AG_CATEGORY, 2);
+        set_attack_value(AT_USTRONG, AG_SPRITE, sprite_get("uair"));
+        set_attack_value(AT_USTRONG, AG_AIR_SPRITE, sprite_get("uair"));
+        set_attack_value(AT_USTRONG, AG_NUM_WINDOWS, 3);
+        set_attack_value(AT_USTRONG, AG_HAS_LANDING_LAG, 1);
+        set_attack_value(AT_USTRONG, AG_LANDING_LAG, 5);
+        set_attack_value(AT_USTRONG, AG_STRONG_CHARGE_WINDOW, 1);
+        set_attack_value(AT_USTRONG, AG_HURTBOX_SPRITE, sprite_get("uair_hurt"));
+        set_attack_value(AT_USTRONG, AG_HURTBOX_AIR_SPRITE, sprite_get("uair_hurt"));
+        set_attack_value(AT_USTRONG, AG_USES_CUSTOM_GRAVITY, 1);
+
+        set_window_value(AT_USTRONG, 1, AG_WINDOW_LENGTH, 8);
+        set_window_value(AT_USTRONG, 1, AG_WINDOW_ANIM_FRAMES, 1);
+        set_window_value(AT_USTRONG, 1, AG_WINDOW_ANIM_FRAME_START, 0);
+        set_window_value(AT_USTRONG, 1, AG_WINDOW_CUSTOM_GRAVITY, 0.26);
+        set_window_value(AT_USTRONG, 1, AG_WINDOW_HAS_SFX, 0);
+
+        set_window_value(AT_USTRONG, 2, AG_WINDOW_LENGTH, 5);
+        set_window_value(AT_USTRONG, 2, AG_WINDOW_ANIM_FRAMES, 1);
+        set_window_value(AT_USTRONG, 2, AG_WINDOW_ANIM_FRAME_START, 1);
+        set_window_value(AT_USTRONG, 2, AG_WINDOW_CUSTOM_GRAVITY, 0.28);
+        set_window_value(AT_USTRONG, 2, AG_WINDOW_HAS_SFX, 1);
+        set_window_value(AT_USTRONG, 2, AG_WINDOW_SFX, sound_get("snd_pink_throw"));
+        set_window_value(AT_USTRONG, 2, AG_WINDOW_SFX_FRAME, 1);
+
+        set_window_value(AT_USTRONG, 3, AG_WINDOW_LENGTH, 8);
+        set_window_value(AT_USTRONG, 3, AG_WINDOW_ANIM_FRAMES, 1);
+        set_window_value(AT_USTRONG, 3, AG_WINDOW_ANIM_FRAME_START, 2);
+        set_window_value(AT_USTRONG, 3, AG_WINDOW_CUSTOM_GRAVITY, 0.35);
+        set_window_value(AT_USTRONG, 3, AG_WINDOW_HAS_CUSTOM_FRICTION, 0);
+        set_window_value(AT_USTRONG, 3, AG_WINDOW_HAS_SFX, 0);
+        set_window_value(AT_USTRONG, 3, AG_WINDOW_HAS_WHIFFLAG, 1);
+
+        set_num_hitboxes(AT_USTRONG, 1);
+
+        set_hitbox_value(AT_USTRONG, 1, HG_HITBOX_TYPE, 2);
+        set_hitbox_value(AT_USTRONG, 1, HG_WINDOW, 2);
+        set_hitbox_value(AT_USTRONG, 1, HG_WINDOW_CREATION_FRAME, 0);
+        set_hitbox_value(AT_USTRONG, 1, HG_LIFETIME, 150);
+        set_hitbox_value(AT_USTRONG, 1, HG_HITBOX_X, 8);
+        set_hitbox_value(AT_USTRONG, 1, HG_HITBOX_Y, -68);
+        set_hitbox_value(AT_USTRONG, 1, HG_WIDTH, 50);
+        set_hitbox_value(AT_USTRONG, 1, HG_HEIGHT, 44);
+        set_hitbox_value(AT_USTRONG, 1, HG_PRIORITY, 3);
+        set_hitbox_value(AT_USTRONG, 1, HG_DAMAGE, 6);
+        set_hitbox_value(AT_USTRONG, 1, HG_ANGLE, 85);
+        set_hitbox_value(AT_USTRONG, 1, HG_BASE_KNOCKBACK, 6.2);
+        set_hitbox_value(AT_USTRONG, 1, HG_KNOCKBACK_SCALING, 0.55);
+        set_hitbox_value(AT_USTRONG, 1, HG_BASE_HITPAUSE, 7);
+        set_hitbox_value(AT_USTRONG, 1, HG_HITPAUSE_SCALING, 0.35);
+        set_hitbox_value(AT_USTRONG, 1, HG_VISUAL_EFFECT, 0);
+        set_hitbox_value(AT_USTRONG, 1, HG_VISUAL_EFFECT_Y_OFFSET, 0);
+        set_hitbox_value(AT_USTRONG, 1, HG_HIT_SFX, sound_get("snd_hurt1"));
+        set_hitbox_value(AT_USTRONG, 1, HG_HITBOX_GROUP, 0);
+        set_hitbox_value(AT_USTRONG, 1, HG_HIT_LOCKOUT, 10);
+        set_hitbox_value(AT_USTRONG, 1, HG_PROJECTILE_SPRITE, sprite_get("cat"));
+        set_hitbox_value(AT_USTRONG, 1, HG_PROJECTILE_MASK, sprite_get("cat"));
+        set_hitbox_value(AT_USTRONG, 1, HG_PROJECTILE_ANIM_SPEED, 0.25);
+        set_hitbox_value(AT_USTRONG, 1, HG_PROJECTILE_HSPEED, 2.2);
+        set_hitbox_value(AT_USTRONG, 1, HG_PROJECTILE_VSPEED, -10.5);
+        set_hitbox_value(AT_USTRONG, 1, HG_PROJECTILE_GRAVITY, 0.28);
+        set_hitbox_value(AT_USTRONG, 1, HG_PROJECTILE_GROUND_BEHAVIOR, 2);
+        set_hitbox_value(AT_USTRONG, 1, HG_PROJECTILE_GROUND_FRICTION, 0);
+        set_hitbox_value(AT_USTRONG, 1, HG_PROJECTILE_WALL_BEHAVIOR, 2);
+        set_hitbox_value(AT_USTRONG, 1, HG_PROJECTILE_IS_TRANSCENDENT, 0);
+    } else {
+        set_attack_value(AT_USTRONG, AG_CATEGORY, 0);
+        set_attack_value(AT_USTRONG, AG_SPRITE, sprite_get("ustrong"));
+        set_attack_value(AT_USTRONG, AG_AIR_SPRITE, sprite_get("ustrong"));
+        set_attack_value(AT_USTRONG, AG_NUM_WINDOWS, 5);
+        set_attack_value(AT_USTRONG, AG_HAS_LANDING_LAG, 3);
+        set_attack_value(AT_USTRONG, AG_STRONG_CHARGE_WINDOW, 1);
+        set_attack_value(AT_USTRONG, AG_HURTBOX_SPRITE, sprite_get("ustrong_hurt"));
+        set_attack_value(AT_USTRONG, AG_HURTBOX_AIR_SPRITE, sprite_get("ustrong_hurt"));
+        set_attack_value(AT_USTRONG, AG_USES_CUSTOM_GRAVITY, 0);
+
+        set_window_value(AT_USTRONG, 1, AG_WINDOW_LENGTH, 6);
+        set_window_value(AT_USTRONG, 1, AG_WINDOW_ANIM_FRAMES, 2);
+        set_window_value(AT_USTRONG, 1, AG_WINDOW_ANIM_FRAME_START, 0);
+        set_window_value(AT_USTRONG, 1, AG_WINDOW_CUSTOM_GRAVITY, 0);
+        set_window_value(AT_USTRONG, 1, AG_WINDOW_HAS_SFX, 0);
+
+        set_window_value(AT_USTRONG, 2, AG_WINDOW_LENGTH, 6);
+        set_window_value(AT_USTRONG, 2, AG_WINDOW_ANIM_FRAMES, 3);
+        set_window_value(AT_USTRONG, 2, AG_WINDOW_ANIM_FRAME_START, 1);
+        set_window_value(AT_USTRONG, 2, AG_WINDOW_CUSTOM_GRAVITY, 0);
+        set_window_value(AT_USTRONG, 2, AG_WINDOW_HAS_SFX, 0);
+
+        set_window_value(AT_USTRONG, 3, AG_WINDOW_LENGTH, 6);
+        set_window_value(AT_USTRONG, 3, AG_WINDOW_ANIM_FRAMES, 3);
+        set_window_value(AT_USTRONG, 3, AG_WINDOW_ANIM_FRAME_START, 4);
+        set_window_value(AT_USTRONG, 3, AG_WINDOW_CUSTOM_GRAVITY, 0);
+        set_window_value(AT_USTRONG, 3, AG_WINDOW_HAS_CUSTOM_FRICTION, 1);
+        set_window_value(AT_USTRONG, 3, AG_WINDOW_HAS_SFX, 1);
+        set_window_value(AT_USTRONG, 3, AG_WINDOW_SFX, sound_get("snd_smallswing"));
+        set_window_value(AT_USTRONG, 3, AG_WINDOW_SFX_FRAME, 1);
+
+        set_window_value(AT_USTRONG, 4, AG_WINDOW_LENGTH, 3);
+        set_window_value(AT_USTRONG, 4, AG_WINDOW_ANIM_FRAMES, 1);
+        set_window_value(AT_USTRONG, 4, AG_WINDOW_ANIM_FRAME_START, 7);
+        set_window_value(AT_USTRONG, 4, AG_WINDOW_CUSTOM_GRAVITY, 0);
+        set_window_value(AT_USTRONG, 4, AG_WINDOW_HAS_SFX, 0);
+        set_window_value(AT_USTRONG, 4, AG_WINDOW_HAS_WHIFFLAG, 0);
+
+        set_window_value(AT_USTRONG, 5, AG_WINDOW_LENGTH, 15);
+        set_window_value(AT_USTRONG, 5, AG_WINDOW_ANIM_FRAMES, 3);
+        set_window_value(AT_USTRONG, 5, AG_WINDOW_ANIM_FRAME_START, 8);
+        set_window_value(AT_USTRONG, 5, AG_WINDOW_CUSTOM_GRAVITY, 0);
+        set_window_value(AT_USTRONG, 5, AG_WINDOW_HAS_SFX, 0);
+        set_window_value(AT_USTRONG, 5, AG_WINDOW_HAS_WHIFFLAG, 1);
+
+        // Start with 1 cat hitbox; additional cats (2..4) unlock dynamically as she charges
+        set_num_hitboxes(AT_USTRONG, 1);
+
+        var u_xs = [45, 64, 83, 102];
+        var u_ys = [-112, -89, -68, -49];
+        var u_hs = [230, 184, 142, 104];
+        var u_angs = [90, 88, 85, 82];
+        for (var c = 1; c <= 4; c++) {
+            set_hitbox_value(AT_USTRONG, c, HG_HITBOX_TYPE, 1);
+            set_hitbox_value(AT_USTRONG, c, HG_WINDOW, 3);
+            set_hitbox_value(AT_USTRONG, c, HG_LIFETIME, 6);
+            set_hitbox_value(AT_USTRONG, c, HG_HITBOX_X, u_xs[c - 1]);
+            set_hitbox_value(AT_USTRONG, c, HG_HITBOX_Y, u_ys[c - 1]);
+            set_hitbox_value(AT_USTRONG, c, HG_WIDTH, 30);
+            set_hitbox_value(AT_USTRONG, c, HG_HEIGHT, u_hs[c - 1]);
+            set_hitbox_value(AT_USTRONG, c, HG_SHAPE, 1);
+            set_hitbox_value(AT_USTRONG, c, HG_PRIORITY, 5 - c);
+            set_hitbox_value(AT_USTRONG, c, HG_DAMAGE, 8);
+            set_hitbox_value(AT_USTRONG, c, HG_ANGLE, u_angs[c - 1]);
+            set_hitbox_value(AT_USTRONG, c, HG_BASE_KNOCKBACK, 6.8);
+            set_hitbox_value(AT_USTRONG, c, HG_KNOCKBACK_SCALING, 0.72);
+            set_hitbox_value(AT_USTRONG, c, HG_BASE_HITPAUSE, 7);
+            set_hitbox_value(AT_USTRONG, c, HG_HITPAUSE_SCALING, 0.50);
+            set_hitbox_value(AT_USTRONG, c, HG_VISUAL_EFFECT, 304);
+            set_hitbox_value(AT_USTRONG, c, HG_VISUAL_EFFECT_Y_OFFSET, -10);
+            set_hitbox_value(AT_USTRONG, c, HG_HIT_SFX, sound_get("snd_damage"));
+            set_hitbox_value(AT_USTRONG, c, HG_HITBOX_GROUP, 1);
         }
     }
 }
@@ -479,10 +615,10 @@ if (attack == AT_JAB) {
         set_hitbox_value(AT_JAB, 1, HG_VISUAL_EFFECT, 304);
     } else {
         set_hitbox_value(AT_JAB, 1, HG_DAMAGE, 5);
-        set_hitbox_value(AT_JAB, 1, HG_BASE_KNOCKBACK, 4);
-        set_hitbox_value(AT_JAB, 1, HG_KNOCKBACK_SCALING, 0);
+        set_hitbox_value(AT_JAB, 1, HG_BASE_KNOCKBACK, 5.0);
+        set_hitbox_value(AT_JAB, 1, HG_KNOCKBACK_SCALING, 0.25);
         set_hitbox_value(AT_JAB, 1, HG_BASE_HITPAUSE, 6);
-        set_hitbox_value(AT_JAB, 1, HG_HITPAUSE_SCALING, 0);
+        set_hitbox_value(AT_JAB, 1, HG_HITPAUSE_SCALING, 0.15);
         set_hitbox_value(AT_JAB, 1, HG_HIT_SFX, sound_get("snd_hurt1"));
         set_hitbox_value(AT_JAB, 1, HG_VISUAL_EFFECT, 0);
     }

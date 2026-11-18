@@ -495,6 +495,16 @@ with phone{
 	 * put the version number and full date.
 	 */
 	
+	initPatch("4.5", "11/18/26");
+	initPatchWords("Update 4.5
+	- Forward Tilt & Jab (Kiss): Added slight outward knockback and recovery balance so opponents cannot be kept locked in either move infinitely.
+	- Ground Left & Right Smash: Fixed double-hit / duplicate explosion bug, tuned the bullet travel to ~50% of its old 4.2 range, and normalized damage (10 -> 17) and knockback to standard smash levels.
+	- Down Air (Down Kitty): Retains its charge (4..7 dmg), bounces off other kitties, lets Pink use kitties as bouncy platforms to rebound or jump off them, and enters pratfall after 3 consecutive airborne uses.
+	- Lockout Clarity: Very faint electric-blue sparks now crackle around Pink's body whenever Kitty Toss or Ground Left/Right Smash is on lockout, and pressing a locked-out move plays a single non-spammable 'Huh?!' voice cue.
+	- Back Air: Converted into a staff tipper move scaling with closeness to the end of the staff (4% inner -> 7% mid -> 11% tipper).
+	- Ground Up Smash: Flicking only launches the nearest cat for light damage (8%); charging now visibly loads each cat (up to 4 cats total!) with higher reach and scales damage continuously up to 26% right before overcharge explosion.
+	- Air Up Smash: Added a new Aerial Up Smash (Up + Strong in midair) that shoots a chargeable kitty upward to bounce around, collide with other kitties, and serve as a jumpable platform!");
+
 	initPatch("4.3", "11/13/26");
 	initPatchWords("Update 4.3\r\n	- Ultimate Cycle: Pink's Battle Box attack now strictly alternates throughout the entire battle (1st is Kitty's, 2nd is Bombs, 3rd is Kitty's, 4th is Bombs, etc., persisting across lives until the match ends).");
 

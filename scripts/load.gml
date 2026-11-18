@@ -76,6 +76,7 @@ sprite_change_offset("dstrong_cry", 96, 190);
 sprite_change_offset("dstrong_cry_hurt", 96, 190);
 sprite_change_offset("overcharge_hurt", 96, 190);
 sprite_change_offset("ustrong_cat", 96, 190);
+sprite_change_offset("ustrong_shoot", 96, 190);
 
 sprite_change_offset("nspecial", 96, 190);
 sprite_change_offset("nspecial_air", 96, 190);

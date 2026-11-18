@@ -27,9 +27,9 @@ if (overcharge_hurt_timer > 0) {
     exit;
 }
 
-// Ground Left & Right Smash (AT_FSTRONG): Extended charge (15 dmg half, 30 dmg full, KOs ~130%),
-// warning flash before overcharge, self-damage if held too long, and spam fatigue tracking!
-if (attack == AT_FSTRONG && !free) {
+// Ground Left & Right Smash (AT_FSTRONG): Extended charge (10 uncharged -> 17 full charge, standard fighter smash power),
+// single hitbox (no double-hit/double-explosion), warning flash before overcharge, self-damage if held too long, and spam fatigue tracking!
+if (attack == AT_FSTRONG && get_attack_value(AT_FSTRONG, AG_CATEGORY) == 0) {
     var f_w1_len = get_window_value(AT_FSTRONG, 1, AG_WINDOW_LENGTH);
     if (window == 1 && window_timer >= f_w1_len - 2) {
         var holding_fstrong = (strong_down || left_strong_down || right_strong_down || attack_down || left_stick_down || right_stick_down);
@@ -50,6 +50,7 @@ if (attack == AT_FSTRONG && !free) {
             if (pink_charge_timer >= 90) {
                 overcharge_warning = false;
                 overcharge_hurt_timer = 36;
+                strong_charge = 0;
                 take_damage(player, -1, 10);
                 vsp = -3.5;
                 hsp = -2.5 * spr_dir;
@@ -61,21 +62,20 @@ if (attack == AT_FSTRONG && !free) {
             }
         } else {
             overcharge_warning = false;
-            strong_charge = round(clamp(pink_charge_timer / 75, 0, 1) * 60);
+            strong_charge = 0; // Scaling is handled explicitly below without engine double-multiplying
             window = 2;
             window_timer = 0;
         }
     }
 
-    // Dynamic charge & spam-fatigue scaling: 9 dmg uncharged -> 15 dmg half charge -> 30 dmg full charge!
+    if (window >= 2) {
+        strong_charge = 0;
+    }
+
+    // Dynamic charge & spam-fatigue scaling: 10 dmg uncharged -> 13.5 dmg half charge -> 17 dmg full charge!
     if (window <= 2) {
         var charge_ratio = clamp(pink_charge_timer / 75, 0, 1);
-        var base_charged_dmg = 9;
-        if (charge_ratio <= 0.5) {
-            base_charged_dmg = lerp(9, 15, charge_ratio * 2);
-        } else {
-            base_charged_dmg = lerp(15, 30, (charge_ratio - 0.5) * 2);
-        }
+        var base_charged_dmg = lerp(10, 17, charge_ratio);
 
         var fat_mult = 1.0;
         if (fstrong_fatigue == 1) fat_mult = 0.80;
@@ -84,19 +84,14 @@ if (attack == AT_FSTRONG && !free) {
         else if (fstrong_fatigue >= 4) fat_mult = 0.25;
 
         var final_dmg = max(2, round(base_charged_dmg * fat_mult));
-        var final_bkb = lerp(7.6, 9.2, charge_ratio);
-        var final_kbs = lerp(0.82, 1.02, charge_ratio) * lerp(1.0, 0.72, min(fstrong_fatigue, 4) / 4);
-        var final_bhp = round(lerp(8, 14, charge_ratio));
+        var final_bkb = lerp(6.8, 8.4, charge_ratio);
+        var final_kbs = lerp(0.78, 0.96, charge_ratio) * lerp(1.0, 0.72, min(fstrong_fatigue, 4) / 4);
+        var final_bhp = round(lerp(8, 12, charge_ratio));
 
         set_hitbox_value(AT_FSTRONG, 1, HG_DAMAGE, final_dmg);
         set_hitbox_value(AT_FSTRONG, 1, HG_BASE_KNOCKBACK, final_bkb);
         set_hitbox_value(AT_FSTRONG, 1, HG_KNOCKBACK_SCALING, final_kbs);
         set_hitbox_value(AT_FSTRONG, 1, HG_BASE_HITPAUSE, final_bhp);
-
-        set_hitbox_value(AT_FSTRONG, 2, HG_DAMAGE, final_dmg);
-        set_hitbox_value(AT_FSTRONG, 2, HG_BASE_KNOCKBACK, final_bkb);
-        set_hitbox_value(AT_FSTRONG, 2, HG_KNOCKBACK_SCALING, final_kbs);
-        set_hitbox_value(AT_FSTRONG, 2, HG_BASE_HITPAUSE, final_bhp);
     }
 
     if (window == 2 && window_timer == 1) {
@@ -243,12 +238,11 @@ if (attack == AT_NSPECIAL) {
 }
 
 // =============================================================================
-// Aerial Bomb Smashes: Air Down Smash (AT_DSTRONG) & Air Left/Right Smash (AT_FSTRONG)
-// Glides through the air with gravity & momentum (instead of stopping mid-air)!
-// Air Down Smash bomb grows larger and larger as charged, deals more damage,
-// flashes when about to overcharge, and hurts Pink if charged too long!
+// Aerial Bomb Smashes (Air Down Smash AT_DSTRONG & Air Left/Right Smash AT_FSTRONG)
+// + Air Up Smash (AT_USTRONG when AG_CATEGORY == 2: Upward Bouncing Kitty Toss)
+// Glides through the air with gravity & momentum!
 // =============================================================================
-if ((attack == AT_DSTRONG || (attack == AT_FSTRONG && get_attack_value(AT_FSTRONG, AG_NUM_WINDOWS) == 4)) && (free || get_attack_value(attack, AG_CATEGORY) == 2)) {
+if ((attack == AT_DSTRONG || attack == AT_FSTRONG || attack == AT_USTRONG) && get_attack_value(attack, AG_CATEGORY) == 2) {
     can_fast_fall = false;
     can_move = false;
 
@@ -276,7 +270,7 @@ if ((attack == AT_DSTRONG || (attack == AT_FSTRONG && get_attack_value(AT_FSTRON
 
     var w_len = get_window_value(attack, 1, AG_WINDOW_LENGTH);
     if (window == 1 && window_timer >= w_len - 2) {
-        var holding_charge = (strong_down || down_strong_down || left_strong_down || right_strong_down || attack_down || down_stick_down || left_stick_down || right_stick_down);
+        var holding_charge = (strong_down || down_strong_down || up_strong_down || left_strong_down || right_strong_down || attack_down || down_stick_down || up_stick_down || left_stick_down || right_stick_down);
         if (attack == AT_DSTRONG) {
             if (holding_charge) {
                 air_charge_timer++;
@@ -320,6 +314,7 @@ if ((attack == AT_DSTRONG || (attack == AT_FSTRONG && get_attack_value(AT_FSTRON
                 if (air_charge_timer >= 78) {
                     overcharge_warning = false;
                     overcharge_hurt_timer = 36;
+                    strong_charge = 0;
                     char_height = 52;
                     take_damage(player, -1, 10);
                     vsp = -3.5;
@@ -336,6 +331,18 @@ if ((attack == AT_DSTRONG || (attack == AT_FSTRONG && get_attack_value(AT_FSTRON
                 window = 2;
                 window_timer = 0;
             }
+        } else if (attack == AT_USTRONG) {
+            // Air Up Smash: Chargeable upward bouncing Kitty throw (up to 45 frames)
+            if (holding_charge && air_charge_timer < 45) {
+                air_charge_timer++;
+                pink_charge_timer = air_charge_timer;
+                strong_charge = min(58, floor(air_charge_timer * 58 / 45));
+                window_timer = w_len - 2;
+            } else {
+                strong_charge = 0;
+                window = 2;
+                window_timer = 0;
+            }
         } else {
             // Air Left / Right Smash (AT_FSTRONG)
             if (holding_charge && air_charge_timer < 60) {
@@ -347,7 +354,11 @@ if ((attack == AT_DSTRONG || (attack == AT_FSTRONG && get_attack_value(AT_FSTRON
         }
     }
 
-    // Dynamic charge scaling for Air Smashes (larger hitbox & higher damage for growing Air DStrong bomb!)
+    if (attack == AT_USTRONG && window >= 2) {
+        strong_charge = 0;
+    }
+
+    // Dynamic charge scaling for Air Smashes
     if (window <= 2) {
         var charge_ratio = clamp(air_charge_timer / 60, 0, 1);
         if (attack == AT_FSTRONG) {
@@ -377,10 +388,16 @@ if ((attack == AT_DSTRONG || (attack == AT_FSTRONG && get_attack_value(AT_FSTRON
             set_hitbox_value(AT_DSTRONG, 2, HG_KNOCKBACK_SCALING, scaled_kbs);
             set_hitbox_value(AT_DSTRONG, 2, HG_WIDTH, wave_w);
             set_hitbox_value(AT_DSTRONG, 2, HG_HEIGHT, wave_h);
+        } else if (attack == AT_USTRONG) {
+            var u_air_ratio = clamp(air_charge_timer / 45, 0, 1);
+            set_hitbox_value(AT_USTRONG, 1, HG_DAMAGE, round(lerp(6, 10, u_air_ratio)));
+            set_hitbox_value(AT_USTRONG, 1, HG_BASE_KNOCKBACK, lerp(6.2, 7.6, u_air_ratio));
+            set_hitbox_value(AT_USTRONG, 1, HG_KNOCKBACK_SCALING, lerp(0.55, 0.80, u_air_ratio));
+            set_hitbox_value(AT_USTRONG, 1, HG_PROJECTILE_VSPEED, lerp(-10.5, -12.5, u_air_ratio));
         }
     }
 
-    if (window <= 3) {
+    if (attack != AT_USTRONG && window <= 3) {
         char_height = 120;
     } else {
         char_height = 52;
@@ -396,45 +413,50 @@ if ((attack == AT_DSTRONG || (attack == AT_FSTRONG && get_attack_value(AT_FSTRON
 
 // =============================================================================
 // Ground Up Smash (AT_USTRONG):
-// As she charges, 1 cat shows up -> 2nd cat right next to it -> 3rd cat right next to it!
-// Launches all 3 cats at 100%, 75%, and 50% height (base 17 dmg -> 26 dmg charged).
-// Overcharging flashes and damages Pink with the shocked hurt sprite!
+// Flick = 1 cat nearest Pink (8 dmg); longer charge visibly loads Cats 2, 3, and 4
+// and scales damage continuously up to 26 dmg right before the frame 90 overcharge explosion!
 // =============================================================================
-if (attack == AT_USTRONG) {
+if (attack == AT_USTRONG && get_attack_value(AT_USTRONG, AG_CATEGORY) == 0) {
     var u_w1_len = get_window_value(AT_USTRONG, 1, AG_WINDOW_LENGTH);
     if (window == 1 && window_timer >= u_w1_len - 2) {
         var holding_ustrong = (strong_down || up_strong_down || attack_down || up_stick_down);
         if (holding_ustrong) {
             pink_charge_timer++;
             window_timer = u_w1_len - 2;
-            strong_charge = min(58, floor(pink_charge_timer * 58 / 60));
+            strong_charge = min(58, floor(pink_charge_timer * 58 / 88));
 
-            if (pink_charge_timer < 15) {
+            if (pink_charge_timer < 14) {
                 ustrong_cat_count = 1;
-            } else if (pink_charge_timer < 30) {
+            } else if (pink_charge_timer < 32) {
                 if (ustrong_cat_count < 2) {
                     ustrong_cat_count = 2;
                     sound_play(sound_get("snd_bump"));
                 }
-            } else {
+            } else if (pink_charge_timer < 50) {
                 if (ustrong_cat_count < 3) {
                     ustrong_cat_count = 3;
+                    sound_play(sound_get("snd_bump"));
+                }
+            } else {
+                if (ustrong_cat_count < 4) {
+                    ustrong_cat_count = 4;
                     sound_play(sound_get("snd_pink_mew"));
                 }
             }
 
-            // Warning flash before overcharging (frames 48..76)
-            if (pink_charge_timer >= 48) {
+            // Warning flash before overcharging (frames 60..90)
+            if (pink_charge_timer >= 60) {
                 overcharge_warning = true;
-                if (pink_charge_timer == 48 || pink_charge_timer == 60 || pink_charge_timer == 68) {
+                if (pink_charge_timer == 60 || pink_charge_timer == 70 || pink_charge_timer == 78 || pink_charge_timer == 84) {
                     sound_play(sound_get("snd_noise"));
                 }
             }
 
-            // Overcharged for too long (frame 76): damages Pink and uses the shocked hurt sprite!
-            if (pink_charge_timer >= 76) {
+            // Overcharged for too long (frame 90): damages Pink and uses the shocked hurt sprite!
+            if (pink_charge_timer >= 90) {
                 overcharge_warning = false;
                 overcharge_hurt_timer = 36;
+                strong_charge = 0;
                 take_damage(player, -1, 10);
                 vsp = -3.5;
                 hsp = -2.0 * spr_dir;
@@ -446,22 +468,27 @@ if (attack == AT_USTRONG) {
             }
         } else {
             overcharge_warning = false;
-            ustrong_cat_count = 3;
-            strong_charge = round(clamp(pink_charge_timer / 60, 0, 1) * 60);
+            strong_charge = 0; // Scaling is handled explicitly below without engine double-multiplying
+            set_num_hitboxes(AT_USTRONG, ustrong_cat_count);
             window = 2;
             window_timer = 0;
         }
     }
 
-    if (window <= 3) {
-        var charge_ratio = clamp(pink_charge_timer / 60, 0, 1);
-        var u_dmg = round(lerp(17, 26, charge_ratio));
-        var u_bkb = lerp(8.0, 9.4, charge_ratio);
-        var u_kbs = lerp(0.85, 1.15, charge_ratio);
-        var u_bhp = round(lerp(9, 14, charge_ratio));
+    if (window >= 2) {
+        strong_charge = 0;
+    }
 
-        for (var c = 1; c <= 3; c++) {
-            var c_kbs = u_kbs - (c - 1) * 0.03;
+    if (window <= 3) {
+        set_num_hitboxes(AT_USTRONG, ustrong_cat_count);
+        var charge_ratio = clamp(pink_charge_timer / 86, 0, 1);
+        var u_dmg = round(lerp(8, 26, charge_ratio));
+        var u_bkb = lerp(6.8, 9.4, charge_ratio);
+        var u_kbs = lerp(0.72, 1.15, charge_ratio);
+        var u_bhp = round(lerp(7, 14, charge_ratio));
+
+        for (var c = 1; c <= ustrong_cat_count; c++) {
+            var c_kbs = u_kbs - (c - 1) * 0.02;
             set_hitbox_value(AT_USTRONG, c, HG_DAMAGE, u_dmg);
             set_hitbox_value(AT_USTRONG, c, HG_BASE_KNOCKBACK, u_bkb);
             set_hitbox_value(AT_USTRONG, c, HG_KNOCKBACK_SCALING, c_kbs);
@@ -479,7 +506,7 @@ if (attack == AT_DSTRONG && !free && get_attack_value(AT_DSTRONG, AG_CATEGORY) =
     }
 }
 
-// Her Down A in the air (AT_DAIR): Downward bouncing Kitty throw (NO freefall!)
+// Her Down A in the air (AT_DAIR): Chargeable downward bouncing Kitty throw (max 3 airborne uses before pratfall)
 if (attack == AT_DAIR && free) {
     // Fortify Pink during aerial Kitty charge:
     if (window == 1) {
@@ -501,16 +528,20 @@ if (attack == AT_DAIR && free) {
             window_timer = dair_w1_len - 2;
         }
     }
-    // Scale Down A Kitty damage with charge (base 6 dmg with +1% buff, up to 9 dmg)
+    // Scale Down A Kitty damage with charge (4 base -> up to 7 dmg) and count airborne uses
     if (window == 2 && window_timer == 1) {
         var bonus_dmg = floor(air_charge_timer / 15);
-        set_hitbox_value(AT_DAIR, 1, HG_DAMAGE, 6 + bonus_dmg);
+        set_hitbox_value(AT_DAIR, 1, HG_DAMAGE, 4 + bonus_dmg);
+        dair_air_uses++;
     }
     if (window == get_attack_value(AT_DAIR, AG_NUM_WINDOWS)
         && window_timer >= get_window_value(AT_DAIR, window, AG_WINDOW_LENGTH) - 1) {
         super_armor = false;
         soft_armor = 0;
-        // Freefall (PS_PRATFALL) removed as requested!
+        if (dair_air_uses >= 3) {
+            attack_end();
+            set_state(PS_PRATFALL);
+        }
     }
 }
 

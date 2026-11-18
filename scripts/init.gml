@@ -27,6 +27,8 @@ overcharge_hurt_timer = 0;
 dstrong_bomb_stage = 0;
 dstrong_bomb_scale = 1.0;
 ustrong_cat_count = 1;
+kitty_step_cd = 0;
+dair_air_uses = 0;
 
 // Ground Left & Right Smash (FStrong) anti-spam fatigue & 7-second lockout
 fstrong_fatigue = 0;       // 0 = full size, 1 = small, 2 = tiny
@@ -34,6 +36,7 @@ fstrong_fatigue_timer = 0; // cooldown timer to recover back to full size
 fstrong_lockout = 0;       // 5.5-second lockout timer (330 frames)
 fstrong_up_timer = 0;      // HUD indicator timer for when it recovers back UP (Pink awake)
 fstrong_hud_nudge = 0;     // subtle visual nudge on HUD when pressed while locked out
+fstrong_lockout_voiced = false;
 
 // X Kitty (NSpecial) anti-spam fatigue & 7-second lockout
 nspecial_fatigue = 0;       // 0 = full size, 1 = small, 2 = tiny
@@ -41,6 +44,7 @@ nspecial_fatigue_timer = 0; // cooldown timer to recover back to full size
 nspecial_lockout = 0;       // 5.5-second lockout timer (330 frames)
 nspecial_up_timer = 0;      // HUD indicator timer for when it recovers back UP (Pink awake)
 nspecial_hud_nudge = 0;     // subtle visual nudge on HUD when pressed while locked out
+nspecial_lockout_voiced = false;
 
 fan_cooldown = 0;
 fan_cooldown_max = 120;

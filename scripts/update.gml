@@ -35,6 +35,10 @@ if (heal_popup_timer > 0)
     heal_popup_y -= 0.6;
 }
 
+if (kitty_step_cd > 0) {
+    kitty_step_cd--;
+}
+
 if (state != PS_PARRY) {
     successful_parry = false;
     parry_success_timer = 0;
@@ -105,13 +109,22 @@ if (fstrong_lockout > 0) {
     fstrong_lockout--;
     if (fstrong_lockout == 0) {
         fstrong_up_timer = 180; // 3 seconds Pink (awake) notification to show it's back UP!
+        fstrong_lockout_voiced = false;
     }
     if (!free) {
         move_cooldown[AT_FSTRONG] = 2; // Locked out from casting Ground FStrong
+        if (state != PS_ATTACK_GROUND && state != PS_ATTACK_AIR && state != PS_HITSTUN && (left_strong_pressed || right_strong_pressed || ((left_down || right_down) && strong_pressed))) {
+            fstrong_hud_nudge = 8;
+            if (!fstrong_lockout_voiced) {
+                fstrong_lockout_voiced = true;
+                sound_play(sound_get("snd_lockout_huh"));
+            }
+        }
     } else {
         move_cooldown[AT_FSTRONG] = 0; // Aerial Bomb drop is still allowed
     }
 } else {
+    fstrong_lockout_voiced = false;
     if (fstrong_up_timer > 0) fstrong_up_timer--;
     if (fstrong_fatigue_timer > 0) {
         fstrong_fatigue_timer--;
@@ -127,9 +140,18 @@ if (nspecial_lockout > 0) {
     nspecial_lockout--;
     if (nspecial_lockout == 0) {
         nspecial_up_timer = 180; // 3 seconds Pink (awake) notification to show it's back UP!
+        nspecial_lockout_voiced = false;
     }
     move_cooldown[AT_NSPECIAL] = 2; // Locked out from casting X Kitty
+    if (state != PS_ATTACK_GROUND && state != PS_ATTACK_AIR && state != PS_HITSTUN && special_pressed && !up_down && !down_down && !left_down && !right_down) {
+        nspecial_hud_nudge = 8;
+        if (!nspecial_lockout_voiced) {
+            nspecial_lockout_voiced = true;
+            sound_play(sound_get("snd_lockout_huh"));
+        }
+    }
 } else {
+    nspecial_lockout_voiced = false;
     if (nspecial_up_timer > 0) nspecial_up_timer--;
     if (nspecial_fatigue_timer > 0) {
         nspecial_fatigue_timer--;
@@ -139,6 +161,11 @@ if (nspecial_lockout > 0) {
     }
 }
 if (nspecial_hud_nudge > 0) nspecial_hud_nudge--;
+
+// Reset airborne Down Kitty spam counter when landing, walljumping, or getting hit
+if (!free || state == PS_WALL_JUMP || state == PS_HITSTUN || state == PS_HITSTUN_LAND) {
+    dair_air_uses = 0;
+}
 
 // Reset on respawn / death / spawn: Doki meter goes to zero, gives chance to earn it again like the first time
 if (state == PS_RESPAWN || state == PS_SPAWN || state == PS_DEAD) {
@@ -153,11 +180,13 @@ if (state == PS_RESPAWN || state == PS_SPAWN || state == PS_DEAD) {
     fstrong_lockout = 0;
     fstrong_up_timer = 0;
     fstrong_hud_nudge = 0;
+    fstrong_lockout_voiced = false;
     nspecial_fatigue = 0;
     nspecial_fatigue_timer = 0;
     nspecial_lockout = 0;
     nspecial_up_timer = 0;
     nspecial_hud_nudge = 0;
+    nspecial_lockout_voiced = false;
     prev_player_damage = 0;
     pink_charge_timer = 0;
     overcharge_warning = false;
@@ -165,6 +194,8 @@ if (state == PS_RESPAWN || state == PS_SPAWN || state == PS_DEAD) {
     dstrong_bomb_stage = 0;
     dstrong_bomb_scale = 1.0;
     ustrong_cat_count = 1;
+    kitty_step_cd = 0;
+    dair_air_uses = 0;
     bb_dummy_hit_timer = [0, 0, 0, 0, 0];
     bb_kitty_hit_timer = [0, 0, 0, 0, 0];
 }
@@ -420,10 +451,53 @@ if (bb_active) {
     }
 }
 
+// Kitty Platforming: Pink can land on her thrown kitties (NSpecial, DAir, & Air UStrong) as a platform and bounce/jump off them!
+if (kitty_step_cd <= 0 && !bb_active && overcharge_hurt_timer <= 0 && free && state != PS_HITSTUN && state != PS_HITSTUN_LAND && state != PS_PRATFALL && state != PS_DEAD && state != PS_RESPAWN) {
+    if (!(state == PS_ATTACK_AIR && ((attack == AT_DAIR || attack == AT_USTRONG) && window <= 2 || (attack == AT_DAIR && dair_air_uses >= 3)))) {
+        _found_kitty = noone;
+        _found_ktop = 42;
+        with (pHitBox) {
+            if (other._found_kitty == noone && player_id == other.id && (attack == AT_NSPECIAL || attack == AT_DAIR || (attack == AT_USTRONG && sprite_index == sprite_get("cat"))) && hitbox_timer >= 5) {
+                var k_top = (sprite_index == sprite_get("cat_tiny")) ? 20 : ((sprite_index == sprite_get("cat_small")) ? 30 : 42);
+                if (abs(other.x - x) <= 28) {
+                    var on_top = (other.vsp >= 0 && other.y >= y - k_top - 6 && other.y <= y - k_top * 0.25 + 8);
+                    var jump_off = (other.jump_pressed && other.vsp > -4 && other.y >= y - k_top - 10 && other.y <= y + 6);
+                    if (on_top || jump_off) {
+                        other._found_kitty = id;
+                        other._found_ktop = k_top;
+                    }
+                }
+            }
+        }
+        if (_found_kitty != noone && instance_exists(_found_kitty)) {
+            var want_jump = (jump_pressed || jump_down);
+            vsp = want_jump ? -jump_speed : -7.2;
+            djumps = 0;
+            has_airdodge = true;
+            has_walljump = true;
+            kitty_step_cd = 6;
+
+            if (state == PS_ATTACK_AIR) {
+                attack_end();
+            }
+            set_state(want_jump ? PS_FIRST_JUMP : PS_IDLE_AIR);
+            state_timer = 0;
+
+            with (_found_kitty) {
+                vsp = max(vsp, 5.5);
+                kitty_bounce_cd = 6;
+            }
+            sound_play(want_jump ? jump_sound : sound_get("snd_bump"));
+            spawn_hit_fx(_found_kitty.x, _found_kitty.y - _found_ktop, 301);
+        }
+    }
+}
+
 // Aerial Strong inputs:
 // - Down + Strong does Aerial Down Smash (AT_DSTRONG when free: glides with gravity, charges growing bomb, drops it downward)
 // - Forward + Strong does Aerial Left/Right Smash (AT_FSTRONG when free: glides with gravity, charges bomb, drops bomb forward)
-// - Up + Strong / Neutral Strong does Ghost Flight (AT_USPECIAL)
+// - Up + Strong does Aerial Up Smash (AT_USTRONG when free: glides with gravity, shoots chargeable bouncing kitty upward)
+// - Neutral Strong (no direction held) does Ghost Flight (AT_USPECIAL) if off cooldown
 // Note: Only triggers on fresh strong presses and does not override Backward Strong so Back Air (AT_BAIR) comes out reliably!
 if (!bb_active && overcharge_hurt_timer <= 0 && free && (state == PS_FIRST_JUMP || state == PS_DOUBLE_JUMP || state == PS_IDLE_AIR || state == PS_WALL_JUMP)) {
     if (down_strong_pressed || (down_down && strong_pressed)) {
@@ -432,7 +506,9 @@ if (!bb_active && overcharge_hurt_timer <= 0 && free && (state == PS_FIRST_JUMP 
         set_attack(AT_FSTRONG);
     } else if ((right_strong_pressed || (right_down && strong_pressed)) && spr_dir == 1) {
         set_attack(AT_FSTRONG);
-    } else if (move_cooldown[AT_USPECIAL] == 0 && (up_strong_pressed || (up_down && strong_pressed) || (strong_pressed && !left_down && !right_down && !down_down))) {
+    } else if (up_strong_pressed || (up_down && strong_pressed)) {
+        set_attack(AT_USTRONG);
+    } else if (move_cooldown[AT_USPECIAL] == 0 && strong_pressed && !left_down && !right_down && !down_down && !up_down) {
         set_attack(AT_USPECIAL);
     }
 }

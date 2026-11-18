@@ -30,20 +30,31 @@ if ((state == PS_ATTACK_AIR || state == PS_ATTACK_GROUND) && attack == AT_DSTRON
 }
 
 // =========================================================================
-// 2. Ground Up Smash (AT_USTRONG): Progressive 1 -> 2 -> 3 Cats during Charge
+// 2. Ground Up Smash (AT_USTRONG): Progressive 1..4 Cats Load & Shoot Upward
 // =========================================================================
-if ((state == PS_ATTACK_GROUND || state == PS_ATTACK_AIR) && attack == AT_USTRONG && window == 1 && overcharge_hurt_timer <= 0) {
-    var ucat_spr = sprite_get("ustrong_cat");
-    if (ustrong_cat_count >= 1 && pink_charge_timer > 0) {
-        draw_sprite_ext(ucat_spr, 1, x, y, spr_dir, 1, 0, c_white, 1);
-    }
-    if (ustrong_cat_count >= 2) {
-        var c2_frame = (pink_charge_timer < 18) ? 0 : 1;
-        draw_sprite_ext(ucat_spr, c2_frame, x + 18 * spr_dir, y, spr_dir, 1, 0, c_white, 1);
-    }
-    if (ustrong_cat_count >= 3) {
-        var c3_frame = (pink_charge_timer < 33) ? 0 : 1;
-        draw_sprite_ext(ucat_spr, c3_frame, x + 36 * spr_dir, y, spr_dir, 1, 0, c_white, 1);
+if ((state == PS_ATTACK_GROUND || state == PS_ATTACK_AIR) && attack == AT_USTRONG && get_attack_value(AT_USTRONG, AG_CATEGORY) == 0 && overcharge_hurt_timer <= 0) {
+    if (window == 1 || window == 2) {
+        var ucat_spr = sprite_get("ustrong_cat");
+        for (var c = 1; c <= ustrong_cat_count; c++) {
+            var c_frame = (c == 1 && window == 1 && pink_charge_timer < 4) ? 0 : 1;
+            draw_sprite_ext(ucat_spr, c_frame, x + (c - 1) * 19 * spr_dir, y, spr_dir, 1, 0, c_white, 1);
+        }
+    } else if (window >= 3 && image_index >= 4 && image_index < 10) {
+        var s_frame = clamp(floor(image_index) - 4, 0, 5);
+        var shoot_spr = sprite_get("ustrong_shoot");
+        var frame_h = (s_frame == 0) ? 76 : ((s_frame == 1) ? 131 : ((s_frame == 2) ? 172 : ((s_frame == 3) ? 190 : ((s_frame == 4) ? 185 : 175))));
+        var cat_scales = [1.20, 0.96, 0.74, 0.54];
+        for (var c = 1; c <= ustrong_cat_count; c++) {
+            var off_x = (c - 1) * 19 * spr_dir;
+            var dy_cur = round(frame_h * (1.0 - cat_scales[c - 1]));
+            if (dy_cur <= 0) {
+                draw_sprite_ext(shoot_spr, s_frame, x + off_x, y + dy_cur, spr_dir, 1, 0, c_white, 1);
+            } else {
+                var draw_h = max(1, 190 - dy_cur);
+                var draw_dx = (spr_dir == 1) ? (x + off_x - 96) : (x + off_x + 96);
+                draw_sprite_part_ext(shoot_spr, s_frame, 0, 0, 192, draw_h, draw_dx, y - 190 + dy_cur, spr_dir, 1, c_white, 1);
+            }
+        }
     }
 }
 
@@ -60,6 +71,41 @@ if ((state == PS_ATTACK_GROUND || state == PS_ATTACK_AIR) && overcharge_warning 
     } else if ((gt % 6) == 0) {
         draw_sprite_ext(sprite_get("overcharge_hurt"), 1, x, y, spr_dir, 1, 0, c_white, 0.75);
     }
+}
+
+// =========================================================================
+// 4. Lockout Body Electricity: Very faint cyan sparks around Pink when NSpecial or Ground FStrong is locked out
+// =========================================================================
+if ((nspecial_lockout > 0 || fstrong_lockout > 0) && state != PS_DEAD && state != PS_RESPAWN && !bb_active) {
+    var gt = get_gameplay_time();
+    var tick = floor(gt / 3);
+    var nudge_active = (nspecial_hud_nudge > 0 || fstrong_hud_nudge > 0);
+    var e_alpha = nudge_active ? 0.56 : (0.26 + 0.08 * sin(gt * 0.25));
+    var arc_count = (nspecial_lockout > 0 && fstrong_lockout > 0) ? 3 : 2;
+    var col_outer = make_color_rgb(100, 210, 255);
+    var col_inner = make_color_rgb(215, 245, 255);
+
+    for (var a = 0; a < arc_count; a++) {
+        var base_ang = tick * 1.15 + a * 2.094;
+        var prev_px = 0;
+        var prev_py = 0;
+        for (var s = 0; s <= 3; s++) {
+            var seg_ang = base_ang + (s / 3) * 0.95;
+            var jx = sin(tick * 2.3 + s * 3.7 + a * 5.1) * 3.2;
+            var jy = cos(tick * 1.9 + s * 4.3 + a * 2.7) * 3.2;
+            var px = x + cos(seg_ang) * 16 + jx;
+            var py = (y - 30) + sin(seg_ang) * 22 + jy;
+            if (s > 0) {
+                draw_set_alpha(e_alpha);
+                draw_line_width_color(prev_px, prev_py, px, py, 2, col_outer, col_outer);
+                draw_set_alpha(e_alpha * 0.75);
+                draw_line_width_color(prev_px, prev_py, px, py, 1, col_inner, col_inner);
+            }
+            prev_px = px;
+            prev_py = py;
+        }
+    }
+    draw_set_alpha(1);
 }
 
 // Tier 2 (Purple) Heart Aura & Tier 3 MAX Radiant Pulse

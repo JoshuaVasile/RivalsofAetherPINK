@@ -37,7 +37,7 @@ if (instance_exists(hit_player_obj) && !hit_player_obj.clone && hit_player_obj.p
     }
 
     // Bonus meter on Marking Hit (Dummy or Kitty): +8%
-    if (my_hitboxID.attack == AT_DSPECIAL || my_hitboxID.attack == AT_NSPECIAL || my_hitboxID.attack == AT_DAIR) {
+    if (my_hitboxID.attack == AT_DSPECIAL || my_hitboxID.attack == AT_NSPECIAL || my_hitboxID.attack == AT_DAIR || (my_hitboxID.attack == AT_USTRONG && my_hitboxID.sprite_index == sprite_get("cat"))) {
         meter_gain += 8;
     }
 
@@ -88,7 +88,7 @@ if (instance_exists(hit_player_obj) && !hit_player_obj.clone && hit_player_obj.p
             bb_dummy_hit_timer[vp] = bb_quick_window;
             sound_play(sound_get("sfx_mark"));
         }
-        if (my_hitboxID.attack == AT_NSPECIAL || my_hitboxID.attack == AT_DAIR) {
+        if (my_hitboxID.attack == AT_NSPECIAL || my_hitboxID.attack == AT_DAIR || (my_hitboxID.attack == AT_USTRONG && my_hitboxID.sprite_index == sprite_get("cat"))) {
             bb_kitty_hit_timer[vp] = bb_quick_window;
             sound_play(sound_get("sfx_mark"));
         }
